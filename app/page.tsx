@@ -1,30 +1,35 @@
 'use client'
 import { GET } from "@/app/lib/utils";
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/app/lib/utils";
 
 export default function Home() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  // const [users, setUsers] = useState<any[]>([]);
+  // const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   GET("/users")
+  //     .then((res) => res.json())
+  //     .then((data) => setUsers(data))
+  //     .finally(() => setLoading(false));
+  // }, []);
+
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       {/* Spinner */}
+  //       <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+  //     </div>
+  //   );
+  // }
   useEffect(() => {
-    GET("/users")
-      .then((res) => res.json())
-      .then((data) => setUsers(data))
-      .finally(() => setLoading(false));
+    getCurrentUser().then(setUser);
   }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        {/* Spinner */}
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="p-4">
-      {users.length > 0 ? (
+      {/* {users.length > 0 ? (
         users.map((user) => (
           <div key={user.id} className="mb-4 p-2 border rounded-lg">
             <h2 className="text-xl font-bold">{user.name}</h2>
@@ -33,7 +38,12 @@ export default function Home() {
         ))
       ) : (
         <p className="text-gray-500">No users found.</p>
-      )}
+      )} */}
+      <h1>Welcome {user ? user.first_name : "Guest"}</h1>
     </div>
   );
 }
+// export const metadata = {
+//   title: "Iworkout - Home",
+//   description: "Welcome to Iworkout, your personal workout companion.",
+// };
