@@ -1,5 +1,4 @@
 'use client'
-import { GET } from "@/app/lib/utils";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/app/lib/utils";
 

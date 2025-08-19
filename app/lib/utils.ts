@@ -1,4 +1,4 @@
-let BASE_URL = "https://iworkout-back.onrender.com"
+const BASE_URL = "https://iworkout-back.onrender.com"
 
 export async function GET(url: string) {
     const URL = `${BASE_URL}${url}`;
