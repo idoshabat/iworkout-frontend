@@ -12,28 +12,30 @@ export default function Navbar() {
     };
 
     return (
-        <div dir="rtl">
-            <nav className="w-full bg-black text-white p-4 flex items-center border-b-2 border-b-amber-50">
-                <div className="flex items-center gap-8">
-                    <Link href="/" className="text-2xl font-bold hover:text-amber-200">
+        <div>
+            <nav className="w-full bg-black text-white p-4 flex items-center border-b-2 border-b-amber-50 mb-8">
+                <div className="flex items-center gap-32">
+                    <Link href="/" className="text-3xl font-bold hover:text-amber-200">
                         Iworkout
                     </Link>
-                    <div className="flex gap-6 text-lg">
-                        <Link href="/users" className="hover:text-gray-300">משתמשים</Link>
-                        <Link href="/drills" className="hover:text-gray-300">תרגילים</Link>
-                        <Link href="/workouts" className="hover:text-gray-300">תוכניות אימון</Link>
-                    </div>
+                    {user &&
+                        <div className="flex gap-24 text-lg">
+                            <Link href="/profile" className="hover:text-gray-300">Profile</Link>
+                            <Link href="/drills" className="hover:text-gray-300">Drills</Link>
+                            <Link href="/workouts" className="hover:text-gray-300">Workouts</Link>
+                        </div>
+                    }
                 </div>
 
-                <div className="mr-auto flex gap-6 text-lg">
+                <div className="ml-auto flex gap-6 text-lg">
                     {!user ? (
                         <>
-                            <Link href="/login" className="hover:text-gray-300">התחבר</Link>
-                            <Link href="/signup" className="hover:text-gray-300">הרשם</Link>
+                            <Link href="/login" className="hover:text-gray-300">Login</Link>
+                            <Link href="/signup" className="hover:text-gray-300">Sign Up</Link>
                         </>
                     ) : (
-                        <button onClick={handleLogout} className="hover:text-gray-300">
-                            התנתק
+                        <button onClick={handleLogout} className="hover:text-gray-300 text-red-500">
+                            Logout
                         </button>
                     )}
                 </div>

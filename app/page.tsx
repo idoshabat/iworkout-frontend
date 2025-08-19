@@ -1,9 +1,13 @@
 'use client'
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/app/lib/utils";
+import { useUser } from '@/app/lib/UserContext';
+
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
+  // const [user, setUser] = useState<any>(null);
+  const { user, setUser } = useUser();
+
   // const [users, setUsers] = useState<any[]>([]);
   // const [loading, setLoading] = useState(true);
 
@@ -22,9 +26,11 @@ export default function Home() {
   //     </div>
   //   );
   // }
-  useEffect(() => {
-    getCurrentUser().then(setUser);
-  }, []);
+
+
+  // useEffect(() => {
+  //   getCurrentUser().then(setUser);
+  // }, []);
 
   return (
     <div className="p-4">
@@ -38,7 +44,7 @@ export default function Home() {
       ) : (
         <p className="text-gray-500">No users found.</p>
       )} */}
-      <h1>Welcome {user ? user.first_name : "Guest"}</h1>
+      <h1>Welcome {user ? user.first_name + " The " + user.role  : "Guest"}</h1>
     </div>
   );
 }

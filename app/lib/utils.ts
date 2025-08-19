@@ -26,7 +26,8 @@ export async function POST(url: string, body: any) {
         body: JSON.stringify(body),
         credentials: "include", // important for cookies
     });
-    console.log('Response:', response);
+    const responseData = await response.json().catch(() => ({})); // parse JSON safely
+    console.log('Response data:', responseData);
     return response;
 }
 
