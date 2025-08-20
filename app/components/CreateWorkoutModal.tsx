@@ -5,11 +5,12 @@ import { useForm } from "react-hook-form";
 import {GET, POST } from "../lib/utils";
 
 type WorkoutFormData = {
-    sport: string;
+    sport?: string;
     name: string;
-    description: string;
-    category: string;
+    description?: string;
+    category?: string;
     trainer?: string;
+    drills: number[]; // Array of selected drill IDs
 };
 
 export default function CreateWorkoutModal({ userId, setWorkouts }: { userId: string; setWorkouts: (workouts: any[]) => void }) {
@@ -30,9 +31,9 @@ export default function CreateWorkoutModal({ userId, setWorkouts }: { userId: st
         try {
             setLoading(true);
             data = { ...data, "trainer": userId };
-
+            console.log('DATAAA', data);
             const res = await POST("/workouts/", data);
-            const workouts = await GET(`/users/trainers/${userId}/workouts`);
+            const workouts = await GET(`/users/trainers/workouts`);
             if(!res.ok) throw new Error("Failed to create workout");
             alert("Workout created successfully!");
             setWorkouts(workouts);
@@ -60,7 +61,7 @@ export default function CreateWorkoutModal({ userId, setWorkouts }: { userId: st
             {isOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
                     <div className="bg-white text-black rounded-2xl p-6 w-full max-w-md shadow-lg">
-                        <h2 className="text-xl font-semibold mb-4">Create Drill</h2>
+                        <h2 className="text-xl font-semibold mb-4">Create Workout</h2>
 
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             {/* Name */}
@@ -68,18 +69,33 @@ export default function CreateWorkoutModal({ userId, setWorkouts }: { userId: st
                                 <label className="block text-sm font-medium">Name</label>
                                 <input
                                     {...register("name", { required: true })}
-                                    placeholder="Enter drill name"
+                                    placeholder="Enter workout name"
                                     className="w-full border px-3 py-2 rounded-lg"
                                 />
                             </div>
 
+                            <div>
+                                <label className="block text-sm font-medium">Drills</label>
+                                <div className="flex flex-col gap-2 max-h-40 overflow-y-auto border rounded-lg p-2">
+                                    {drills.map((drill) => (
+                                        <label key={drill.id} className="flex items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                value={drill.id}
+                                                {...register("drills", { required: true })}
+                                            />
+                                            {drill.name}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
 
                             {/* Description */}
                             <div>
                                 <label className="block text-sm font-medium">Description</label>
                                 <textarea
                                     {...register("description")}
-                                    placeholder="Describe the drill..."
+                                    placeholder="Describe the workout..."
                                     className="w-full border px-3 py-2 rounded-lg"
                                 />
                             </div>

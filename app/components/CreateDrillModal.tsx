@@ -33,11 +33,11 @@ export default function CreateDrillModal({ userId, setDrills }: { userId: string
 
             await POST("/drills/", data);
             alert("Drill created successfully!");
-            const drills = await GET(`/users/trainers/${userId}/drills`);
+            const drills = await GET(`/users/trainers/drills`);
             setDrills(drills);
             reset();
             setIsOpen(false);
-        } catch (err: unknown) {
+        } catch (err: unknown) { 
             console.error(err);
             alert("Failed to create drill");
         } finally {
