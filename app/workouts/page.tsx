@@ -8,7 +8,7 @@ export default function WorkoutsPage() {
     const [workouts, setWorkouts] = useState<any[]>([]);
     useEffect(() => {
             const fetchWorkouts = async () => {
-                const data = await GET("/workouts");
+                const data = await GET(`/users/trainers/${user.id}/workouts`);
                 setWorkouts(data);
             };
             fetchWorkouts();

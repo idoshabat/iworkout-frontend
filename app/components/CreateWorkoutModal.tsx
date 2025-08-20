@@ -32,7 +32,7 @@ export default function CreateWorkoutModal({ userId, setWorkouts }: { userId: st
             data = { ...data, "trainer": userId };
 
             const res = await POST("/workouts/", data);
-            const workouts = await GET("/workouts");
+            const workouts = await GET(`/users/trainers/${userId}/workouts`);
             if(!res.ok) throw new Error("Failed to create workout");
             alert("Workout created successfully!");
             setWorkouts(workouts);

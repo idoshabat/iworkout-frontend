@@ -1,33 +1,33 @@
-'use client'
+"use client";
+
 import { useUser } from "@/app/lib/UserContext";
 import { useState, useEffect } from "react";
 import CreateDrillModal from "../components/CreateDrillModal";
-import {GET} from "@/app/lib/utils";
+import { GET } from "@/app/lib/utils";
 
 export default function DrillsPage() {
     const { user } = useUser();
-    if (!user) {
-        return <h1 className="text-2xl">Loading...</h1>;
-    }
-    console.log('USER', user);
-    // const [showModal, setShowModal] = useState<boolean>(false);
-    const [drills, setDrills] = useState<any[]>([]); // Placeholder for drills data
+    const [drills, setDrills] = useState<any[]>([]);
 
     useEffect(() => {
+        if (!user) return; // only fetch if user exists
         const fetchDrills = async () => {
-            const data = await GET("/drills");
+            const data = await GET(`/users/trainers/${user.id}/drills`);
             setDrills(data);
         };
         fetchDrills();
-    }, []);
+    }, [user]);
+
+    if (!user) {
+        return <h1 className="text-2xl">Loading...</h1>;
+    }
 
     return (
         <div>
             <h1>Drills</h1>
-            {(user && user.role === "athlete") ? (
+            {user.role === "athlete" ? (
                 <div>
                     <h2>Drills from my coaches</h2>
-                    {/* Admin controls go here */}
                 </div>
             ) : (
                 <div className="flex flex-col items-center">
@@ -37,9 +37,10 @@ export default function DrillsPage() {
                             <div key={drill.id} className="p-4 border rounded-lg">
                                 <h3 className="text-xl font-bold">{drill.name}</h3>
                                 <p>{drill.description}</p>
+                                <p>Created by: {drill.trainer}</p>
                             </div>
                         ))}
-                    <CreateDrillModal userId={user.id} setDrills={setDrills} />
+                        <CreateDrillModal userId={user.id} setDrills={setDrills} />
                     </div>
                 </div>
             )}
