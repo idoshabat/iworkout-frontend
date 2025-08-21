@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, use } from "react";
+import Link from "next/link";
 import { GET } from "@/app/lib/utils";
 import { useUser } from "@/app/lib/UserContext";
 import AddAthleteToWorkoutModal from "@/app/components/AddAthleteToWorkoutModal";
@@ -14,7 +15,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
     const [athlete, setAthlete] = useState<any[]>([]);
     const [showModal, setShowModal] = useState(false);
 
-    
+
     useEffect(() => {
         if (!user) return; // only fetch if user exists
         if (user.role === 'athlete') {
@@ -23,11 +24,11 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
             GET(`/users/trainers/${user.id}`).then(setTrainer);
         }
     }, [user]);
-    
+
     useEffect(() => {
         const fetchWorkout = async () => {
             const data = await GET(`/workouts/${unwrappedParams.id}`);
-            setWorkout(data); 
+            setWorkout(data);
         };
         fetchWorkout();
     }, [unwrappedParams.id]);
@@ -49,32 +50,38 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
     if (!workout) {
         return <h1 className="text-2xl">Loading...</h1>;
     }
-    
+
     return (
         <div className="flex flex-col items-center gap-2">
             <h1 className="text-2xl font-bold">{workout.name}</h1>
             <p>{workout.description}</p>
             <h2 className="text-xl font-bold">Drills</h2>
-            <h2 className="text-lg">
-                Users with access - {workout.athletes.length > 0 ? workout.athletes.join(", ") : "No users yet"}
-            </h2>
-            <Button onClick={() => setShowModal(true)}>Add User To Workout</Button>
+            {trainer && (
+                <>
+                    <Button onClick={() => setShowModal(true)}>Add User To Workout</Button>
+                    <h2 className="text-lg">
+                        Users with access - {workout.athletes.length > 0 ? workout.athletes.join(", ") : "No users yet"}
+                    </h2>
+                </>
+            )}
             <div className="flex flex-col gap-4 w-full items-center">
                 {drills.map((drill) => (
                     <div key={drill.id} className="w-1/4 min-h-[10vh] border rounded p-2 my-2 flex flex-col items-center justify-center text-center">
-                        <h2>{drill.name}</h2>
+                        <Link href={`/drills/${drill.id}?workoutId=${workout.id}`}>
+                            {drill.name}
+                        </Link>
                     </div>
                 ))}
             </div>
 
-            {showModal && (
+            {trainer && showModal && (
                 <AddAthleteToWorkoutModal
-                user={user}
-                trainer={trainer}
-                workout={workout}
-                onClose={() => setShowModal(false)}
-                onUpdateWorkout={setWorkout} // update state directly
-            />
+                    user={user}
+                    trainer={trainer}
+                    workout={workout}
+                    onClose={() => setShowModal(false)}
+                    onUpdateWorkout={setWorkout} // update state directly
+                />
             )}
         </div>
     );

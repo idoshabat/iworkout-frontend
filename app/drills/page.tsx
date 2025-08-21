@@ -2,6 +2,7 @@
 
 import { useUser } from "@/app/lib/UserContext";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import CreateDrillModal from "../components/CreateDrillModal";
 import { GET } from "@/app/lib/utils";
 
@@ -35,7 +36,7 @@ export default function DrillsPage() {
                     <div className="flex flex-col gap-4">
                         {drills.map((drill) => (
                             <div key={drill.id} className="p-4 border rounded-lg">
-                                <h3 className="text-xl font-bold">{drill.name}</h3>
+                                <Link href={`/drills/${drill.id}`} className="text-xl font-bold">{drill.name}</Link>
                                 <p>{drill.description}</p>
                                 <p>Created by: {drill.trainer}</p>
                             </div>

@@ -11,11 +11,21 @@ export default function WorkoutsPage() {
 
     useEffect(() => {
         if (!user) return;   // 👈 תבדוק פה במקום לעשות return למעלה
-        const fetchWorkouts = async () => {
-            const data = await GET(`/users/trainers/workouts`);
-            setWorkouts(data);
-        };
-        fetchWorkouts();
+        if (user.role === 'trainer') {
+            const fetchWorkouts = async () => {
+                const data = await GET(`/users/trainers/workouts`);
+                setWorkouts(data);
+            };
+            fetchWorkouts();
+        }
+        if (user.role === 'athlete') {
+            const fetchWorkouts = async () => {
+                const data = await GET(`/users/athletes/workouts`);
+                setWorkouts(data);
+            };
+            fetchWorkouts();
+        }
+
     }, [user]);
 
     if (!user) {
@@ -37,7 +47,9 @@ export default function WorkoutsPage() {
                     </div>
                 ))}
             </div>
-            <CreateWorkoutModal userId={user.id} setWorkouts={setWorkouts} />
+            {user.role === 'trainer' && (
+                <CreateWorkoutModal userId={user.id} setWorkouts={setWorkouts} />
+            )}
         </div>
     );
 }
