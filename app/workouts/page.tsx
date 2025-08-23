@@ -4,6 +4,7 @@ import Link from "next/link";
 import CreateWorkoutModal from "@/app/components/CreateWorkoutModal";
 import { useUser } from "../lib/UserContext";
 import { GET } from "@/app/lib/utils";
+import Title from "../components/Title";
 
 export default function WorkoutsPage() {
     const { user } = useUser();   // 👈 תביא את ה־user קודם
@@ -34,7 +35,7 @@ export default function WorkoutsPage() {
 
     return (
         <div>
-            <h1>Workouts</h1>
+            <Title>Workouts</Title>
             <div className="flex flex-col gap-4">
             {workouts && workouts.length > 0 ? (
                 workouts.map((workout) => (

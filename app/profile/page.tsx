@@ -3,6 +3,7 @@
 import { useUser } from '@/app/lib/UserContext';
 import { useState, useEffect } from 'react';
 import { GET } from '@/app/lib/utils';
+import Title from '../components/Title';
 
 export default function ProfilePage() {
     const { user, setUser } = useUser();
@@ -49,7 +50,7 @@ export default function ProfilePage() {
 
     return (
         <div className="flex flex-col items-center justify-center ">
-            <h1 className="text-4xl">Profile</h1>
+            <Title>Profile</Title>
             {/* Profile details go here */}
             {user ? (
                 <div className='flex flex-col gap-4 mt-8 justify-start'>

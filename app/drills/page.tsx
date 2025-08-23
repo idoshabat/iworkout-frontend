@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import CreateDrillModal from "../components/CreateDrillModal";
 import { GET } from "@/app/lib/utils";
+import Title from "../components/Title";
 
 export default function DrillsPage() {
     const { user } = useUser();
@@ -25,14 +26,14 @@ export default function DrillsPage() {
 
     return (
         <div>
-            <h1>Drills</h1>
+            <Title>Drills</Title>
             {user.role === "athlete" ? (
                 <div>
-                    <h2>Drills from my coaches</h2>
+                    <Title size="sm">Drills from my coaches</Title>
                 </div>
             ) : (
                 <div className="flex flex-col items-center">
-                    <h2>I'm the coach and these are my drills</h2>
+                    <Title size="sm">I'm the coach and these are my drills</Title>
                     <div className="flex flex-col gap-4">
                         {drills.map((drill) => (
                             <div key={drill.id} className="p-4 border rounded-lg">

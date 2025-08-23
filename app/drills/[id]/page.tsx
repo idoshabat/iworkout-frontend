@@ -5,6 +5,7 @@ import { useState, useEffect, use } from "react";
 import { GET } from "@/app/lib/utils";
 import { useSearchParams } from "next/navigation";
 import Button from "@/app/components/Button";
+import Title from "@/app/components/Title";
 
 
 export default function DrillPage({ params }: { params: Promise<{ id: string }> }) {
@@ -33,9 +34,10 @@ export default function DrillPage({ params }: { params: Promise<{ id: string }> 
 
     return (
         <div className="flex flex-col items-center gap-2">
+            <Title>Drill Details</Title>
             {drill && (
                 <div className="flex flex-col items-start gap-2">
-                    <h1 className="text-2xl font-bold mb-2">Name - {drill.name}</h1>
+                    <Title size="sm">{drill.name}</Title>
                     <h2 className="text-xl">Description - {drill.description}</h2>
                     <h2 className="text-xl">Sport - {drill.sport}</h2>
                     <h2 className="text-xl">Category - {drill.category}</h2>

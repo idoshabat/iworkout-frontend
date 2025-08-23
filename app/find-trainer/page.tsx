@@ -6,6 +6,7 @@ import AthleteDisplay from "../components/AthleteDispaly";
 import Error from "../components/Error";
 import { set } from "react-hook-form";
 import { fetchTrainer , fetchAthlete } from "../lib/utils";
+import Title from "../components/Title";
 
 export default function FindTrainerPage() {
     const [email, setEmail] = useState("");
@@ -53,7 +54,7 @@ export default function FindTrainerPage() {
 
     return (
         <div className="p-4">
-            <h1 className="text-xl font-bold mb-4">Find User</h1>
+            <Title>Find User</Title>
 
             {/* Search Form */}
             <form onSubmit={handleSearch} className="flex gap-2 items-center">

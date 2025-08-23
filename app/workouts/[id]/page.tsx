@@ -5,6 +5,7 @@ import { GET } from "@/app/lib/utils";
 import { useUser } from "@/app/lib/UserContext";
 import AddAthleteToWorkoutModal from "@/app/components/AddAthleteToWorkoutModal";
 import Button from "@/app/components/Button";
+import Title from "@/app/components/Title";
 
 export default function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
     const { user } = useUser();
@@ -53,7 +54,8 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
 
     return (
         <div className="flex flex-col items-center gap-2">
-            <h1 className="text-2xl font-bold">{workout.name}</h1>
+            <Title>Workouts</Title>
+            <Title size="sm">{workout.name}</Title>
             <p>{workout.description}</p>
             <h2 className="text-xl font-bold">Drills</h2>
             {trainer && (
