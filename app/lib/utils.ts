@@ -10,6 +10,7 @@ export async function GET(url: string) {
         },
         credentials: "include", // important for cookies
     });
+    console.log('Response status:', response.status);
     const responseData = await response.json().catch(() => ({})); // parse JSON safely
     console.log('Response data:', responseData);
     return responseData;
@@ -68,9 +69,22 @@ export async function getCurrentUser() {
     });
 
     if (!res.ok) {
-        console.log('Error fetching user:', res.statusText);
+        console.log('Error fetching user:', await res.json());
         throw new Error("Not authenticated" + res.statusText);
     }
 
     return await res.json(); // returns the user object
+}
+
+export async function fetchAthlete(userId: string) {
+    const data = await GET(`/users/athletes/${userId}`);
+    return data;
+    // const responseData = await data.json().catch(() => ({})); // parse JSON safely
+    // return responseData;
+};
+
+export async function fetchTrainer(userId: string) {
+    const data = await GET(`/users/trainers/${userId}`);
+    const responseData = await data.json().catch(() => ({})); // parse JSON safely
+    return responseData;
 }

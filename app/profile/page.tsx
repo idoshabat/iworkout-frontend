@@ -7,7 +7,7 @@ import { GET } from '@/app/lib/utils';
 export default function ProfilePage() {
     const { user, setUser } = useUser();
     const [trainer, setTrainer] = useState<any>(null);
-    const [athlete, setAthlete] = useState<any[]>([]);
+    const [athlete, setAthlete] = useState<any>(null);
 
     useEffect(() => {
         if (!user) {
@@ -39,6 +39,7 @@ export default function ProfilePage() {
     }
 
     const attributes = [
+        { label: "ID", value: user.id },
         { label: "Name", value: user.first_name + " " + user.last_name },
         { label: "Email", value: user.email },
         { label: "Date of birth", value: user.date_of_birth },
@@ -71,10 +72,11 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            {athlete.length > 0 && (
+            {athlete && (
                 <div className="mt-8">
                     <h2 className="text-2xl">Athlete Actions</h2>
                     {/* Add athlete-specific actions here */}
+                    My trainer - {athlete.trainers ? athlete.trainers.join(", ") : "No trainer assigned"}
                 </div>
             )}
         </div>

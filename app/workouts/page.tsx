@@ -36,7 +36,8 @@ export default function WorkoutsPage() {
         <div>
             <h1>Workouts</h1>
             <div className="flex flex-col gap-4">
-                {workouts.map((workout) => (
+            {workouts && workouts.length > 0 ? (
+                workouts.map((workout) => (
                     <div key={workout.id} className="p-4 border rounded-lg">
                         <Link href={`/workouts/${workout.id}`} className="text-xl font-bold">
                             {workout.name}
@@ -44,12 +45,13 @@ export default function WorkoutsPage() {
                         <p>{workout.description}</p>
                         <p>{workout.trainer === user.id ? "You are the trainer" : "You are not the trainer"}</p>
                         <p>Drills: {workout.drills.map((drill: any) => drill).join(" , ")}</p>
-                    </div>
-                ))}
-            </div>
-            {user.role === 'trainer' && (
-                <CreateWorkoutModal userId={user.id} setWorkouts={setWorkouts} />
+                    </div> 
+                ))
+            ) : (
+                <p>No workouts found.</p>
             )}
+            </div>
+            <CreateWorkoutModal userId={user.id} setWorkouts={setWorkouts} />
         </div>
     );
 }
