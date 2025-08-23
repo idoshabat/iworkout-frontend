@@ -76,6 +76,34 @@ export async function getCurrentUser() {
     return await res.json(); // returns the user object
 }
 
+export async function getCurrentAthlete() {
+    const res = await fetch(`${BASE_URL}/users/me/athlete`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    if (!res.ok) {
+        console.log('Error fetching athlete:', await res.json());
+        throw new Error("Not authenticated" + res.statusText);
+    }
+
+    return await res.json();
+}
+
+export async function getCurrentTrainer() {
+    const res = await fetch(`${BASE_URL}/users/me/trainer`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    if (!res.ok) {
+        console.log('Error fetching trainer:', await res.json());
+        throw new Error("Not authenticated" + res.statusText);
+    }
+
+    return await res.json();
+}
+
 export async function fetchAthlete(userId: string) {
     const data = await GET(`/users/athletes/${userId}`);
     return data;
