@@ -54,7 +54,7 @@ export default function FindTrainerPage() {
 
     return (
         <div className="p-4">
-            <Title>Find User</Title>
+            <Title>Find Trainer</Title>
 
             {/* Search Form */}
             <form onSubmit={handleSearch} className="flex gap-2 items-center">
@@ -62,7 +62,7 @@ export default function FindTrainerPage() {
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter user email"
+                    placeholder="Enter trainer's email"
                     className="border px-2 py-1 rounded flex-1"
                 />
                 <Button type="submit" onClick={() => { }}>Search</Button>

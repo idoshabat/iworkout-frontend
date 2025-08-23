@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { GET } from "@/app/lib/utils";
@@ -9,22 +9,13 @@ import Title from "@/app/components/Title";
 
 export default function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
     const { user } = useUser();
-    const unwrappedParams = use(params); // ✅ unwrap params
+    const unwrappedParams = use(params);
     const [workout, setWorkout] = useState<any>(null);
     const [drills, setDrills] = useState<any[]>([]);
-    const [trainer, setTrainer] = useState<any>(null);
-    const [athlete, setAthlete] = useState<any[]>([]);
     const [showModal, setShowModal] = useState(false);
 
-
-    useEffect(() => {
-        if (!user) return; // only fetch if user exists
-        if (user.role === 'athlete') {
-            GET(`/users/athletes/${user.id}`).then(setAthlete);
-        } else if (user.role === 'trainer') {
-            GET(`/users/trainers/${user.id}`).then(setTrainer);
-        }
-    }, [user]);
+    const trainer = user?.role === 'trainer' ? user.trainer_profile : null;
+    const athlete = user?.role === 'athlete' ? user.athlete_profile : null;
 
     useEffect(() => {
         const fetchWorkout = async () => {
@@ -44,36 +35,46 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
         };
         fetchDrills();
     }, [workout]);
+
     if (!user) {
-        return <h1 className="text-2xl">Loading...</h1>;
+        return <h1 className="text-2xl text-center mt-8">There is no logged-in user</h1>;
     }
 
     if (!workout) {
-        return <h1 className="text-2xl">Loading...</h1>;
+        return <h1 className="text-2xl text-center mt-8">Can't find workout</h1>;
     }
 
     return (
-        <div className="flex flex-col items-center gap-2">
-            <Title>Workouts</Title>
+        <div className="flex flex-col items-center gap-4 p-6">
+            <Title>Workout Details</Title>
             <Title size="sm">{workout.name}</Title>
-            <p>{workout.description}</p>
-            <h2 className="text-xl font-bold">Drills</h2>
+            <p className="text-gray-300 text-center">{workout.description}</p>
+
             {trainer && (
-                <>
-                    <Button onClick={() => setShowModal(true)}>Add User To Workout</Button>
-                    <h2 className="text-lg">
-                        Users with access - {workout.athletes.length > 0 ? workout.athletes.join(", ") : "No users yet"}
+                <div className="flex flex-col items-center gap-2 my-4">
+                    <Button onClick={() => setShowModal(true)}>Add Athlete to Workout</Button>
+                    <h2 className="text-lg font-medium mt-2">
+                        Users with access:{" "}
+                        {workout.athletes.length > 0 ? workout.athletes.join(", ") : "No users yet"}
                     </h2>
-                </>
+                </div>
             )}
-            <div className="flex flex-col gap-4 w-full items-center">
-                {drills.map((drill) => (
-                    <div key={drill.id} className="w-1/4 min-h-[10vh] border rounded p-2 my-2 flex flex-col items-center justify-center text-center">
-                        <Link href={`/drills/${drill.id}?workoutId=${workout.id}`}>
+
+            <h2 className="text-xl font-semibold mt-4">Drills</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mt-2">
+                {drills.length > 0 ? (
+                    drills.map((drill) => (
+                        <Link
+                            key={drill.id}
+                            href={`/drills/${drill.id}?workoutId=${workout.id}`}
+                            className="p-4 bg-gray-900 text-white rounded-xl shadow hover:shadow-lg transition-shadow duration-200 text-center"
+                        >
                             {drill.name}
                         </Link>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    <p className="text-gray-400 text-center col-span-full">No drills added yet</p>
+                )}
             </div>
 
             {trainer && showModal && (
@@ -82,7 +83,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
                     trainer={trainer}
                     workout={workout}
                     onClose={() => setShowModal(false)}
-                    onUpdateWorkout={setWorkout} // update state directly
+                    onUpdateWorkout={setWorkout}
                 />
             )}
         </div>

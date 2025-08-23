@@ -1,4 +1,3 @@
-
 'use client'
 import { useUser } from '@/app/lib/UserContext';
 import { useState, useEffect } from 'react';
@@ -6,80 +5,98 @@ import { GET } from '@/app/lib/utils';
 import Title from '../components/Title';
 
 export default function ProfilePage() {
-    const { user, setUser } = useUser();
-    const [trainer, setTrainer] = useState<any>(null);
-    const [athlete, setAthlete] = useState<any>(null);
+  const { user } = useUser();
+  const [trainer, setTrainer] = useState<any>(null);
+  const [athlete, setAthlete] = useState<any>(null);
 
-    useEffect(() => {
-        if (!user) {
-            return;
-        }
+  useEffect(() => {
+    if (!user) return;
 
-        const fetchTrainer = async () => {
-            console.log(`/users/trainers/${user.id}`);
-            const data = await GET(`/users/trainers/${user.id}`);
-            setTrainer(data);
-        };
+    const fetchTrainer = async () => {
+      const data = await GET(`/users/trainers/${user.id}`);
+      setTrainer(data);
+    };
 
-        const fetchAthlete = async () => {
-            const data = await GET(`/users/athletes/${user.id}`);
-            setAthlete(data);
-        };
-        if (user.role === 'athlete') {
-            fetchAthlete();
-            console.log("ATHLETE", athlete);
-        }
-        else if (user.role === 'trainer') {
-            fetchTrainer();
-            console.log('TRAINER', trainer);
-        }
-    }, [user]);
+    const fetchAthlete = async () => {
+      const data = await GET(`/users/athletes/${user.id}`);
+      setAthlete(data);
+    };
 
-    if (!user) {
-        return <h1 className="text-2xl">Loading...</h1>;
-    }
+    if (user.role === 'athlete') fetchAthlete();
+    else if (user.role === 'trainer') fetchTrainer();
+  }, [user]);
 
-    const attributes = [
-        { label: "ID", value: user.id },
-        { label: "Name", value: user.first_name + " " + user.last_name },
-        { label: "Email", value: user.email },
-        { label: "Date of birth", value: user.date_of_birth },
-        { label: "Role", value: user.role },
-        { label: "Gender", value: user.gender },
-    ];
+  if (!user) {
+    return <h1 className="text-2xl text-center mt-10 text-gray-400">Loading...</h1>;
+  }
 
-    return (
-        <div className="flex flex-col items-center justify-center ">
-            <Title>Profile</Title>
-            {/* Profile details go here */}
-            {user ? (
-                <div className='flex flex-col gap-4 mt-8 justify-start'>
-                    {attributes.map((attr) => (
-                        <div className="flex flex-row" key={attr.label}>
-                            <h2>{attr.label} : </h2>
-                            <h2>{attr.value}</h2>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <h1>No user information available</h1>
-            )}
+  const attributes = [
+    { label: "ID", value: user.id },
+    { label: "Name", value: user.first_name + " " + user.last_name },
+    { label: "Email", value: user.email },
+    { label: "Date of birth", value: user.date_of_birth },
+    { label: "Role", value: user.role },
+    { label: "Gender", value: user.gender },
+  ];
 
-            {trainer && (
-                <div className="mt-8">
-                    <h2 className="text-2xl">Trainer Actions</h2>
-                    {/* Add trainer-specific actions here */}
-                    My athletes - {trainer.athletes ? trainer.athletes.join(", ") : "No athletes yet"}
-                </div>
-            )}
+  return (
+    <div className="flex flex-col items-center p-6">
+      <Title size="lg">👤 Profile</Title>
 
-            {athlete && (
-                <div className="mt-8">
-                    <h2 className="text-2xl">Athlete Actions</h2>
-                    {/* Add athlete-specific actions here */}
-                    My trainer - {athlete.trainers ? athlete.trainers.join(", ") : "No trainer assigned"}
-                </div>
-            )}
+      {/* Profile Card */}
+      <div className="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-lg p-6 mt-6">
+        <h2 className="text-xl font-semibold text-white mb-4">User Information</h2>
+        <div className="space-y-3">
+          {attributes.map((attr) => (
+            <div
+              key={attr.label}
+              className="flex justify-between border-b border-gray-700 pb-2"
+            >
+              <span className="text-gray-400">{attr.label}</span>
+              <span className="text-white">{attr.value || "-"}</span>
+            </div>
+          ))}
         </div>
-    );
+      </div>
+
+      {/* Trainer Section */}
+      {trainer && (
+        <div className="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-lg p-6 mt-8">
+          <h2 className="text-xl font-semibold text-white mb-4">Trainer Dashboard</h2>
+          <h3 className="text-lg font-medium text-gray-300 mb-2">My Athletes</h3>
+
+          {user.trainer_profile?.athletes?.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {user.trainer_profile.athletes.map((athlete: any) => (
+                <div
+                  key={athlete.id}
+                  className="p-4 bg-gray-800 rounded-xl shadow hover:bg-gray-700 transition"
+                >
+                  <h3 className="text-white font-medium">
+                    {athlete.first_name} {athlete.last_name}
+                  </h3>
+                  <p className="text-gray-400 text-sm">{athlete.email}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400">You don’t have any athletes yet.</p>
+          )}
+        </div>
+      )}
+
+      {/* Athlete Section */}
+      {athlete && (
+        <div className="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-lg p-6 mt-8">
+          <h2 className="text-xl font-semibold text-white mb-4">Athlete Dashboard</h2>
+          <h3 className="text-lg text-gray-300 mb-2">My Trainer</h3>
+          <p className="text-white">
+            {athlete.trainers?.length > 0
+              ? athlete.trainers.join(", ")
+              : "No trainer assigned"}
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }

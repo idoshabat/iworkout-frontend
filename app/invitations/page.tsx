@@ -52,10 +52,10 @@ export default function InvitationsPage() {
                 <Title>Invitations</Title>
                 <div className="flex justify-end mb-4">
                     <Link
-                        href="/find-trainer"
+                        href="/find-athlete"
                         className="inline-block px-5 py-2 rounded-md bg-gray-600 text-white font-semibold shadow hover:bg-gray-700 transition-colors"
                     >
-                        Find Trainer
+                        Find Athlete
                     </Link>
                 </div>
                 {invitations.map((invitation) => (

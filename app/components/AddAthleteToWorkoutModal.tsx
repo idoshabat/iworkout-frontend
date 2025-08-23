@@ -69,17 +69,17 @@ export default function AddAthleteToWorkoutModal({
                     <ul className="space-y-2 max-h-40 overflow-y-auto pr-2">
                         {trainer?.athletes?.length > 0 ? (
                             trainer.athletes.map((athlete: any) => (
-                                <li key={athlete} className="flex items-center gap-2">
+                                <li key={athlete.id} className="flex items-center gap-2">
                                     <input
-                                        id={`athlete-${athlete}`}
+                                        id={`athlete-${athlete.id}`}
                                         type="checkbox"
-                                        value={athlete.toString()} // ensure it's a string
+                                        value={athlete.id.toString()} // ensure it's a string
                                         className="w-4 h-4 accent-blue-500"
-                                        checked={selectedAthletes.includes(athlete.toString())} // compare strings
+                                        checked={selectedAthletes.includes(athlete.id.toString())} // compare strings
                                         onChange={handleCheckboxChange}
                                     />
-                                    <label htmlFor={`athlete-${athlete}`} className="text-gray-700">
-                                        {athlete}
+                                    <label htmlFor={`athlete-${athlete.id}`} className="text-gray-700">
+                                        {athlete.id + " - " + athlete.first_name + " " + athlete.last_name}
                                     </label>
                                 </li>
                             ))
