@@ -49,9 +49,10 @@ export default function WorkoutsPage() {
                                 Drills:{" "}
                                 {workout.drills && workout.drills.length > 0 ? (
                                     workout.drills.map((drill: any, i: number) => (
-                                        <span key={drill.id}>
-                                            <Link href={`/drills/${drill.id}?workoutId=${workout.id}`} className="text-blue-400 hover:underline">
-                                                {drill.name}
+                                        <span key={drill}>
+                                            
+                                            <Link href={`/drills/${drill}?workoutId=${workout.id}`} className="text-blue-400 hover:underline">
+                                                {drill}
                                             </Link>
                                             {i < workout.drills.length - 1 ? ", " : ""}
                                         </span>

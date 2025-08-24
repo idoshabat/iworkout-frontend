@@ -5,7 +5,7 @@ import { useState, useEffect, use } from "react";
 import { GET } from "@/app/lib/utils";
 import { useSearchParams } from "next/navigation";
 import Button from "@/app/components/Button";
-import Title from "@/app/components/Title"; 
+import Title from "@/app/components/Title";
 
 export default function DrillPage({ params }: { params: Promise<{ id: string }> }) {
     const { user } = useUser();
@@ -73,6 +73,13 @@ export default function DrillPage({ params }: { params: Promise<{ id: string }> 
                         <p className="text-gray-500 text-sm">Difficulty</p>
                         <p className="text-white font-medium">{drill.difficulty}</p>
                     </div>
+                    {drill.video_url ? (
+                        <video controls className="w-full max-w-2xl mt-4 rounded-xl">
+                            <source src={drill.video_url} />
+                        </video>
+                    ) : (
+                        <p className="text-gray-500 text-sm">No video available</p>
+                    )}
                 </div>
             </div>
 

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import {GET, POST } from "../lib/utils";
+import { GET, POST } from "../lib/utils";
+import CloudinaryVideoPicker from "./CloudinaryVideoPicker";
+
 
 type DrillFormData = {
     sport: string;
@@ -16,6 +18,8 @@ export default function CreateDrillModal({ userId, setDrills }: { userId: string
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const { register, handleSubmit, reset, watch } = useForm<DrillFormData>();
+    const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const [videoPublicId, setVideoPublicId] = useState<string | null>(null);
 
     const sportTypes = ["Soccer", "Basketball", "Tennis"];
     const categoryTypes: Record<string, string[]> = {
@@ -26,18 +30,29 @@ export default function CreateDrillModal({ userId, setDrills }: { userId: string
 
     const selectedSport = watch("sport"); // Watch sport selection
 
+    const handleUploaded = ({ url, public_id }: { url: string; public_id: string }) => {
+        setVideoUrl(url);
+        setVideoPublicId(public_id);
+    };
+
     const onSubmit = async (data: DrillFormData) => {
         try {
             setLoading(true);
             data = { ...data, "trainer": userId };
 
-            await POST("/drills/", data);
+            const payload = {
+                ...data,
+                trainer: userId,
+                video_url: videoUrl,
+                video_public_id: videoPublicId,
+            };
+            const res = await POST("/drills/", payload);
             alert("Drill created successfully!");
             const drills = await GET(`/users/trainers/drills`);
             setDrills(drills);
             reset();
             setIsOpen(false);
-        } catch (err: unknown) { 
+        } catch (err: unknown) {
             console.error(err);
             alert("Failed to create drill");
         } finally {
@@ -119,6 +134,16 @@ export default function CreateDrillModal({ userId, setDrills }: { userId: string
                                     placeholder="Describe the drill..."
                                     className="w-full border px-3 py-2 rounded-lg"
                                 />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium">Video (optional)</label>
+                                <CloudinaryVideoPicker onUploaded={handleUploaded} />
+                                {videoUrl && (
+                                    <video controls className="w-full mt-2 rounded-xl">
+                                        <source src={videoUrl} />
+                                    </video>
+                                )}
                             </div>
 
                             {/* Buttons */}
