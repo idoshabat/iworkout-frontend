@@ -32,6 +32,44 @@ export async function POST(url: string, body: any) {
     return response;
 }
 
+export async function PATCH(url: string, body: any) {
+    const URL = `${BASE_URL}${url}`;
+    console.log('Patching to:', URL);
+    const response = await fetch(URL, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        credentials: "include", // important for cookies
+    });
+    const responseData = await response.json().catch(() => ({})); // parse JSON safely
+    console.log('Response data::', responseData);
+    return response;
+}
+
+export async function DELETE(url: string) {
+    const URL = `${BASE_URL}${url}`;
+    console.log('Deleting:', URL);
+    const response = await fetch(URL, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",   // ✅ THIS is the key
+
+    });
+
+    // parse JSON only once
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.detail || "Login failed");
+    }
+
+    return data; // data.user and data.detail are available here
+}
+
 export async function login(email: string, password: string) {
     const res = await fetch(`${BASE_URL}/users/login/`, {
         method: "POST",
