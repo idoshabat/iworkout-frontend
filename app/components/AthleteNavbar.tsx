@@ -29,6 +29,7 @@ export default function AthleteNavbar() {
                         <Link href="/profile" className="hover:text-gray-300">Profile</Link>
                         <Link href="/drills" className="hover:text-gray-300">Drills</Link>
                         <Link href="/workouts" className="hover:text-gray-300">Workouts</Link>
+                        <Link href="/my-trainers" className="hover:text-gray-300">My Trainers</Link>
                         <Link href="/invitations" className="hover:text-gray-300">Invitations</Link>
                     </div>
                 )}
@@ -64,6 +65,7 @@ export default function AthleteNavbar() {
                             <Link href="/profile" onClick={() => setIsOpen(false)}>Profile</Link>
                             <Link href="/drills" onClick={() => setIsOpen(false)}>Drills</Link>
                             <Link href="/workouts" onClick={() => setIsOpen(false)}>Workouts</Link>
+                            <Link href="/my-trainers" onClick={() => setIsOpen(false)}>My Trainers</Link>
                             <Link href="/invitations" onClick={() => setIsOpen(false)}>Invitations</Link>
                         </>
                     )}
