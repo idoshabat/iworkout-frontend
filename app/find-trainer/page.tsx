@@ -1,7 +1,7 @@
 'use client'
 
-import { GET, POST, fetchAthlete } from "../lib/utils";
 import { useState } from "react";
+import { GET, POST } from "../lib/utils";
 import AthleteDisplay from "../components/AthleteDispaly";
 import Error from "../components/Error";
 import Title from "../components/Title";
@@ -9,7 +9,6 @@ import Title from "../components/Title";
 export default function FindTrainerPage() {
     const [email, setEmail] = useState("");
     const [foundUser, setFoundUser] = useState<any>(null);
-    const [athlete, setAthlete] = useState<any>(null);
     const [error, setError] = useState<boolean>(false);
     const [inviting, setInviting] = useState(false);
     const [invited, setInvited] = useState(false);
@@ -26,11 +25,11 @@ export default function FindTrainerPage() {
                 return;
             }
 
-            if (user.role === "athlete") {
-                const athleteData = await fetchAthlete(user.id);
-                setAthlete(athleteData);
-            } else {
-                setAthlete(null);
+            // Ensure the user is a trainer
+            if (user.role !== "trainer") {
+                setError(true);
+                setFoundUser(null);
+                return;
             }
 
             setError(false);
@@ -48,7 +47,7 @@ export default function FindTrainerPage() {
         setInviting(true);
 
         try {
-            const res = await POST(`/users/invitations/send/`, { athlete: foundUser.id });
+            const res = await POST(`/users/invitations/send/`, { trainer: foundUser.id });
             if (res.ok) {
                 setInvited(true);
             } else {
@@ -85,7 +84,7 @@ export default function FindTrainerPage() {
             </form>
 
             {/* Result */}
-            {foundUser && athlete && (
+            {foundUser && (
                 <div className="flex flex-col gap-4 mt-6">
                     <AthleteDisplay user={foundUser} />
                     <div className="flex gap-2 flex-wrap">
@@ -112,19 +111,7 @@ export default function FindTrainerPage() {
                 </div>
             )}
 
-            {foundUser && !athlete && (
-                <div className="flex flex-col gap-4 mt-6 text-center">
-                    <p className="text-gray-600">User is not an athlete</p>
-                    <button
-                        onClick={() => setFoundUser(null)}
-                        className="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-400 transition"
-                    >
-                        Back
-                    </button>
-                </div>
-            )}
-
-            {error && <Error message={"User not found"} />}
+            {error && <Error message={"Trainer not found"} />}
         </div>
     );
 }

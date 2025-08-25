@@ -45,6 +45,21 @@ export default function MyTrainersPage() {
     <div className="p-6 max-w-lg mx-auto">
       <Title size="lg">🏋️ My Trainers</Title>
 
+      <div className="flex items-center justify-center mx-auto gap-4 mt-6 mb-4">
+        <a
+          href="/find-trainer"
+          className="inline-block px-6 py-2 rounded-lg bg-blue-300 hover:bg-blue-400 text-white font-semibold shadow transition"
+        >
+          Find Trainer
+        </a>
+        <a
+          href="/invitations"
+          className="inline-block px-6 py-2 rounded-lg bg-blue-300 hover:bg-blue-400 text-white font-semibold shadow transition"
+        >
+          Invitations
+        </a>
+      </div>
+
       <div className="mt-6 p-6 bg-gray-900 rounded-xl shadow-lg">
         {trainers.map((trainer) => (
           <div key={trainer.id} className="mb-4">
