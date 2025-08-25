@@ -1,39 +1,54 @@
 'use client'
-import { useSearchParams } from "next/navigation";
+import { useUser } from '@/app/lib/UserContext';
 import { useState, useEffect } from 'react';
-import { GET } from "../lib/utils";
-import Title from "../components/Title";
+import { GET } from '@/app/lib/utils';
+import Title from '../components/Title';
 
-export default function ProfilePage() {
-    const searchParams = useSearchParams();
-    const email = searchParams.get("email");
-    const [foundUser, setFoundUser] = useState<any>(null);
+
+export default function MyProfilePage() {
+    const { user } = useUser();
+    const [trainer, setTrainer] = useState<any>(null);
+    const [athlete, setAthlete] = useState<any>(null);
+    const [trainerPlans, setTrainerPlans] = useState<any[]>([]);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const data = await GET(`/users/get-user-by-email/?email=${email}`);
-                // const data = await res.json();
-                setFoundUser(data);
-            } catch (error) {
-                console.error("Error fetching user:", error);
-            }
+        if (!user) return;
+
+        const fetchTrainer = async () => {
+            // const data = await GET(`/users/trainers/${user.id}`);
+            setTrainer(user.trainer_profile);
         };
 
-        if (email) fetchUser();
-    }, [email]);
+        const fetchAthlete = async () => {
+            // const data = await GET(`/users/athletes/${user.id}`);
+            setAthlete(user.athlete_profile);
+        };
 
-    if (!foundUser) {
+        const fetchPlans = async () => {
+            // const data = await GET(`/users/trainers/plans`);
+            setTrainerPlans(user.trainer_profile?.plans || []);
+        };
+
+        if (user.role === 'athlete') fetchAthlete();
+        else if (user.role === 'trainer') {
+            fetchPlans();
+            fetchTrainer();
+        }
+
+    }, [user]);
+
+
+    if (!user) {
         return <h1 className="text-2xl text-center mt-10 text-gray-400">Loading...</h1>;
     }
 
     const attributes = [
-        { label: "ID", value: foundUser.id },
-        { label: "Name", value: `${foundUser.first_name} ${foundUser.last_name}` },
-        { label: "Email", value: foundUser.email },
-        { label: "Date of birth", value: foundUser.date_of_birth },
-        { label: "Role", value: foundUser.role },
-        { label: "Gender", value: foundUser.gender },
+        { label: "ID", value: user.id },
+        { label: "Name", value: user.first_name + " " + user.last_name },
+        { label: "Email", value: user.email },
+        { label: "Date of birth", value: user.date_of_birth },
+        { label: "Role", value: user.role },
+        { label: "Gender", value: user.gender },
     ];
 
     return (
@@ -57,15 +72,15 @@ export default function ProfilePage() {
             </div>
 
             {/* Trainer Section */}
-            {foundUser.role === "trainer" && (
+            {trainer && (
                 <>
                     <div className="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-lg p-6 mt-8">
                         <h2 className="text-xl font-semibold text-white mb-4">Trainer Dashboard</h2>
                         <h3 className="text-lg font-medium text-gray-300 mb-2">My Athletes</h3>
 
-                        {foundUser.trainer_profile?.athletes?.length > 0 ? (
+                        {user.trainer_profile?.athletes?.length > 0 ? (
                             <div className="grid gap-4 sm:grid-cols-2">
-                                {foundUser.trainer_profile.athletes.map((athlete: any) => (
+                                {user.trainer_profile.athletes.map((athlete: any) => (
                                     <div
                                         key={athlete.id}
                                         className="p-4 bg-gray-800 rounded-xl shadow hover:bg-gray-700 transition"
@@ -78,15 +93,14 @@ export default function ProfilePage() {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-gray-400">This trainer doesn’t have any athletes yet.</p>
+                            <p className="text-gray-400">You don’t have any athletes yet.</p>
                         )}
                     </div>
-
                     <div className="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-lg p-6 mt-8">
                         <h2 className="text-xl font-semibold text-white mb-4">My Plans</h2>
-                        {foundUser.trainer_profile?.plans?.length > 0 ? (
+                        {trainerPlans && trainerPlans.length > 0 ? (
                             <div className="space-y-3">
-                                {foundUser.trainer_profile.plans.map((plan: any) => (
+                                {trainerPlans.map((plan) => (
                                     <div
                                         key={plan.id}
                                         className="flex justify-between border-b border-gray-700 pb-2"
@@ -97,25 +111,36 @@ export default function ProfilePage() {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-gray-400">This trainer doesn’t have any plans yet.</p>
+                            <p className="text-gray-400">You don’t have any plans yet.</p>
                         )}
                     </div>
                 </>
             )}
 
             {/* Athlete Section */}
-            {foundUser.role === "athlete" && (
-                <div className="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-lg p-6 mt-8">
-                    <h2 className="text-xl font-semibold text-white mb-4">Athlete Dashboard</h2>
-                    <h3 className="text-lg text-gray-300 mb-2">My Trainers</h3>
-                    <p className="text-white">
-                        {foundUser.athlete_profile?.trainers?.length > 0
-                            ? foundUser.athlete_profile.trainers
-                                  .map((trainer: any) => `${trainer.first_name} ${trainer.last_name}`)
-                                  .join(", ")
-                            : "No trainer assigned"}
-                    </p>
-                </div>
+            {athlete && (
+                <>
+                    <div className="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-lg p-6 mt-8">
+                        <h2 className="text-xl font-semibold text-white mb-4">Athlete Dashboard</h2>
+                        <h3 className="text-lg text-gray-300 mb-2">My Trainer</h3>
+                    </div>
+                </>
+            )}
+
+            {/* Athlete Section */}
+            {athlete && (
+                <>
+                    <div className="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-lg p-6 mt-8">
+                        <h2 className="text-xl font-semibold text-white mb-4">Athlete Dashboard</h2>
+                        <h3 className="text-lg text-gray-300 mb-2">My Trainer</h3>
+                        <p className="text-white">
+                            {athlete.trainers?.length > 0
+                                ? athlete.trainers.join(", ")
+                                : "No trainer assigned"}
+                        </p>
+                    </div>
+
+                </>
             )}
         </div>
     );

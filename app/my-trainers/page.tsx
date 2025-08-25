@@ -65,7 +65,12 @@ export default function MyTrainersPage() {
           <div key={trainer.id} className="mb-4">
             <h2 className="text-2xl font-bold text-white">{trainer.first_name} {trainer.last_name}</h2>
             <p className="text-gray-400 mt-2">Email: {trainer.email}</p>
-            {trainer.phone && <p className="text-gray-400 mt-1">Phone: {trainer.phone}</p>}
+            <a
+                href={`/profile?email=${trainer.email}`}
+                className="mt-4 inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow"
+              >
+                View Profile
+              </a>            
           </div>
         ))}
         {trainers[0].bio && <p className="text-gray-400 mt-1">{trainers[0].bio}</p>}

@@ -84,6 +84,12 @@ export default function MyAthletesPage() {
               </h3>
               <p className="text-gray-400 mt-1">{athlete.email}</p>
               <p className="text-gray-400 mt-1">{athlete.id}</p>
+              <a
+                href={`/profile?email=${athlete.email}`}
+                className="mt-4 inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow"
+              >
+                View Profile
+              </a>
             </div>
           ))}
         </div>

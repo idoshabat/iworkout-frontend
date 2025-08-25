@@ -26,7 +26,7 @@ export default function AthleteNavbar() {
                 {/* Desktop links */}
                 {user && (
                     <div className="hidden md:flex gap-8 text-lg">
-                        <Link href="/profile" className="hover:text-gray-300">Profile</Link>
+                        <Link href="/my-profile" className="hover:text-gray-300">Profile</Link>
                         <Link href="/drills" className="hover:text-gray-300">Drills</Link>
                         <Link href="/workouts" className="hover:text-gray-300">Workouts</Link>
                         <Link href="/my-trainers" className="hover:text-gray-300">My Trainers</Link>
@@ -62,7 +62,7 @@ export default function AthleteNavbar() {
                 <div className="mt-4 flex flex-col gap-4 md:hidden text-lg">
                     {user && (
                         <>
-                            <Link href="/profile" onClick={() => setIsOpen(false)}>Profile</Link>
+                            <Link href="/my-profile" onClick={() => setIsOpen(false)}>Profile</Link>
                             <Link href="/drills" onClick={() => setIsOpen(false)}>Drills</Link>
                             <Link href="/workouts" onClick={() => setIsOpen(false)}>Workouts</Link>
                             <Link href="/my-trainers" onClick={() => setIsOpen(false)}>My Trainers</Link>
