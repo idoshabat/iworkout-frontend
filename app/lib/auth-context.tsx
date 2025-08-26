@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       if (!res.ok) throw new Error("Failed to fetch user");
 
-      const data: User = await res.json();
+      const data: User =  res.data;
       setUser(data);
     } catch (err) {
       setUser(null);
