@@ -15,7 +15,7 @@ export default function SignupPage() {
 
         try {
             const response = await POST("/users/register/", data);
-            const resData = await response.json().catch(() => ({}));
+            const resData = await response.data.json().catch(() => ({}));
 
             if (response.status === 201) {
                 window.location.href = "/login";

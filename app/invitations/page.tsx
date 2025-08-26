@@ -12,6 +12,7 @@ type Invitation = {
     athlete: string | number;
     athlete_name: string;
     status: string;
+    sender: string | number;
 };
 
 export default function InvitationsPage() {
@@ -23,7 +24,7 @@ export default function InvitationsPage() {
     useEffect(() => {
         const fetchInvitations = async () => {
             const data = await GET('/users/invitations/');
-            setInvitations(data);
+            setInvitations(data.data);
         };
         fetchInvitations();
     }, []);
@@ -32,6 +33,7 @@ export default function InvitationsPage() {
     const handleRespond = async (id: string | number, action: 'accept' | 'decline') => {
         setLoadingId(id);
         const res = await POST(`/users/invitations/${id}/respond/`, { "action": action });
+        console.log('response:', res);
         if (res.ok) {
             // Update the invitation status locally
             setInvitations((prev) =>
@@ -40,8 +42,8 @@ export default function InvitationsPage() {
                 )
             );
         } else {
-            const errorData = await res.json();
-            console.error("Error responding to invitation:", errorData.error || errorData.message || errorData);
+            const errorData =  res.data;
+            console.error("Error responding to invitation:",  errorData);
         }
         setLoadingId(null);
     };
@@ -72,7 +74,7 @@ export default function InvitationsPage() {
                     )}
                 </div>
 
-                {invitations.map((invitation) => (
+                {invitations.length>0 && invitations.map((invitation) => (
                     <div
                         className="rounded-lg shadow-md border border-gray-200 p-6 bg-white flex flex-col gap-2"
                         key={invitation.id}
@@ -91,7 +93,7 @@ export default function InvitationsPage() {
                                 {invitation.status.charAt(0).toUpperCase() + invitation.status.slice(1)}
                             </span>
                         </p>
-                        {user && invitation.status === 'pending' && (
+                        {user && invitation.status === 'pending' && invitation.sender !== user.id && (
                             <div className="flex gap-2 mt-2">
                                 <button
                                     className="px-4 py-1 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"

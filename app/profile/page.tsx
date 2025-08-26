@@ -1,20 +1,36 @@
 'use client'
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from 'react';
-import { GET } from "../lib/utils";
+import { GET, POST } from "../lib/utils";
 import Title from "../components/Title";
+import Link from "next/link";
+import { useUser } from "../lib/UserContext";
 
 export default function ProfilePage() {
+    const { user } = useUser();
     const searchParams = useSearchParams();
     const email = searchParams.get("email");
     const [foundUser, setFoundUser] = useState<any>(null);
+    // const [userSubscriptions, setUserSubscriptions] = useState<any[]>([]);
+
+    // useEffect(() => {
+    //     if (user) {
+    //         setUserSubscriptions(user.athlete_profile.subscriptions.map((sub: any) => sub.plan_id));
+    //     }
+    // }, [user]);
+
+    useEffect(() => {
+        if (user) {
+            console.log('user.athlete_profile.subscriptions:', user.athlete_profile.subscriptions);
+        }
+    }, [user]);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const data = await GET(`/users/get-user-by-email/?email=${email}`);
+                const res = await GET(`/users/get-user-by-email/?email=${email}`);
                 // const data = await res.json();
-                setFoundUser(data);
+                setFoundUser(res.data);
             } catch (error) {
                 console.error("Error fetching user:", error);
             }
@@ -22,6 +38,30 @@ export default function ProfilePage() {
 
         if (email) fetchUser();
     }, [email]);
+
+    const handleSubscribe = async (planId: string | number) => {
+        try {
+            const res = await POST(`/users/athletes/subscriptions/${planId}/`, {});
+            if (res.ok) {
+                alert("Successfully subscribed to the plan!");
+
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleUnsubscribe = async (planId: string | number) => {
+        try {
+            const res = await POST(`/users/athletes/unsubscriptions/${planId}/`, {});
+            if (res.ok) {
+                alert("Successfully unsubscribed from the plan!");
+
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     if (!foundUser) {
         return <h1 className="text-2xl text-center mt-10 text-gray-400">Loading...</h1>;
@@ -91,8 +131,13 @@ export default function ProfilePage() {
                                         key={plan.id}
                                         className="flex justify-between border-b border-gray-700 pb-2"
                                     >
-                                        <span className="text-gray-400">{plan.name}</span>
+                                        <Link href={`/my-plans/${plan.id}`} className="text-gray-400">{plan.name}</Link>
                                         <span className="text-white">{plan.description || "-"}</span>
+                                        {user && user.athlete_profile.subscriptions.some((sub: any) => sub.plan_id === plan.id && sub.active) ? (
+                                            <button className="bg-blue-300 text-black cursor-pointer px-4 py-2 rounded" onClick={() => handleUnsubscribe(plan.id)}>Unsubscribe</button>
+                                        ) : (
+                                            <button className="bg-blue-500 text-white cursor-pointer px-4 py-2 rounded" onClick={() => handleSubscribe(plan.id)}>Subscribe</button>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -111,8 +156,8 @@ export default function ProfilePage() {
                     <p className="text-white">
                         {foundUser.athlete_profile?.trainers?.length > 0
                             ? foundUser.athlete_profile.trainers
-                                  .map((trainer: any) => `${trainer.first_name} ${trainer.last_name}`)
-                                  .join(", ")
+                                .map((trainer: any) => `${trainer.first_name} ${trainer.last_name}`)
+                                .join(", ")
                             : "No trainer assigned"}
                     </p>
                 </div>

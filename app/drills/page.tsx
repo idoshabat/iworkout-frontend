@@ -14,8 +14,8 @@ export default function DrillsPage() {
     useEffect(() => {
         if (!user) return; // only fetch if user exists
         const fetchDrills = async () => {
-            const data = await GET(`/users/trainers/drills`);
-            setDrills(data);
+            const res = await GET(`/users/trainers/drills`);
+            setDrills(res.data);
         };
         fetchDrills();
     }, [user]);

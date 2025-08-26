@@ -19,8 +19,8 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
 
     useEffect(() => {
         const fetchWorkout = async () => {
-            const data = await GET(`/workouts/${unwrappedParams.id}`);
-            setWorkout(data);
+            const res = await GET(`/workouts/${unwrappedParams.id}`);
+            setWorkout(res.data);
         };
         fetchWorkout();
     }, [unwrappedParams.id]);
@@ -31,7 +31,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
         const fetchDrills = async () => {
             const url = `/drills/get-few-drills?ids=${workout.drills.join(",")}`;
             const data = await GET(url);
-            setDrills(data);
+            setDrills(data.data);
         };
         fetchDrills();
     }, [workout]);
@@ -55,14 +55,14 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
                     <Button onClick={() => setShowModal(true)}>Add Athlete to Workout</Button>
                     <h2 className="text-lg font-medium mt-2">
                         Users with access:{" "}
-                        {workout.athletes.length > 0 ? workout.athletes.join(", ") : "No users yet"}
+                        {workout.athletes && workout.athletes.length > 0 ? workout.athletes.join(", ") : "No users yet"}
                     </h2>
                 </div>
             )}
 
             <h2 className="text-xl font-semibold mt-4">Drills</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mt-2">
-                {drills.length > 0 ? (
+                {drills && drills.length > 0 ? (
                     drills.map((drill) => (
                         <Link
                             key={drill.id}

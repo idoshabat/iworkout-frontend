@@ -18,7 +18,8 @@ export default function FindTrainerPage() {
         if (!email.trim()) return;
 
         try {
-            const user = await GET(`/users/get-user-by-email/?email=${email}`);
+            const res = await GET(`/users/get-user-by-email/?email=${email}`);
+            const user = res.data;
             if (!user.id) {
                 setError(true);
                 setFoundUser(null);
@@ -51,7 +52,7 @@ export default function FindTrainerPage() {
             if (res.ok) {
                 setInvited(true);
             } else {
-                const data = await res.json();
+                const data = res.data;
                 alert(data.error || data.message || "Failed to send invitation");
             }
         } catch (err) {

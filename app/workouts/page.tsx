@@ -17,7 +17,7 @@ export default function WorkoutsPage() {
             const url = user.role === 'trainer' ? 
                 `/users/trainers/workouts` : `/users/athletes/workouts`;
             const data = await GET(url);
-            setWorkouts(data);
+            setWorkouts(data.data);
         };
 
         fetchWorkouts();

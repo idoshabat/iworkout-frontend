@@ -21,8 +21,8 @@ export default function CreateWorkoutModal({ userId, setWorkouts }: { userId: st
 
     useEffect(() => {
             const fetchDrills = async () => {
-                const data = await GET("/drills");
-                setDrills(data);
+                const res = await GET("/drills");
+                setDrills(res.data);
             };
             fetchDrills();
         }, []);
@@ -33,10 +33,10 @@ export default function CreateWorkoutModal({ userId, setWorkouts }: { userId: st
             data = { ...data, "trainer": userId };
             console.log('DATAAA', data);
             const res = await POST("/workouts/", data);
-            const workouts = await GET(`/users/trainers/workouts`);
+            const workoutsRes = await GET(`/users/trainers/workouts`);
             if(!res.ok) throw new Error("Failed to create workout");
             alert("Workout created successfully!");
-            setWorkouts(workouts);
+            setWorkouts(workoutsRes.data);
             reset();
             setIsOpen(false);
         } catch (err: unknown) {

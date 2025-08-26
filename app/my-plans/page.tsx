@@ -20,11 +20,11 @@ export default function MyPlansPage() {
     async function fetchPlans() {
       try {
         const data = await GET("/users/trainers/plans/");
-        if (Array.isArray(data)) {
-          setPlans(data);
-        } else if (data.results) {
+        if (Array.isArray(data.data)) {
+          setPlans(data.data);
+        } else if (data.data.results) {
           // in case you use pagination
-          setPlans(data.results);
+          setPlans(data.data.results);
         }
       } catch (error) {
         console.error("Failed to fetch plans:", error);

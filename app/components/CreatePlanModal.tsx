@@ -20,8 +20,8 @@ export default function CreatePlanModal({ setPlans }: { setPlans: (plans: any[])
     // Fetch all workouts for the trainer to select
     useEffect(() => {
         const fetchWorkouts = async () => {
-            const data = await GET("/users/trainers/workouts");
-            setWorkouts(data);
+            const res = await GET("/users/trainers/workouts");
+            setWorkouts(res.data);
         };
         fetchWorkouts();
     }, []);
@@ -30,12 +30,13 @@ export default function CreatePlanModal({ setPlans }: { setPlans: (plans: any[])
         try {
             setLoading(true);
             const res = await POST("/users/trainers/plans/", data);
+            console.log('data', data);
 
             if (!res.ok) throw new Error("Failed to create plan");
 
-            const plans = await GET("/users/trainers/plans");
+            const plansRes = await GET("/users/trainers/plans");
             alert("Plan created successfully!");
-            setPlans(plans);
+            setPlans(plansRes.data);
             reset();
             setIsOpen(false);
         } catch (err: unknown) {

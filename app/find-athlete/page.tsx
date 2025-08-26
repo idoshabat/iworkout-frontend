@@ -1,6 +1,6 @@
 'use client'
 
-import { GET, POST, fetchAthlete } from "../lib/utils";
+import { GET, POST } from "../lib/utils";
 import { useState } from "react";
 import AthleteDisplay from "../components/AthleteDispaly";
 import Error from "../components/Error";
@@ -19,7 +19,8 @@ export default function FindTrainerPage() {
         if (!email.trim()) return;
 
         try {
-            const user = await GET(`/users/get-user-by-email/?email=${email}`);
+            const res = await GET(`/users/get-user-by-email/?email=${email}`);
+            const user = res.data;
             if (!user.id) {
                 setError(true);
                 setFoundUser(null);
@@ -27,7 +28,8 @@ export default function FindTrainerPage() {
             }
 
             if (user.role === "athlete") {
-                const athleteData = await fetchAthlete(user.id);
+                // const athleteData = await fetchAthlete(user.id);
+                const athleteData = user.athlete_profile;
                 setAthlete(athleteData);
             } else {
                 setAthlete(null);
@@ -49,11 +51,17 @@ export default function FindTrainerPage() {
 
         try {
             const res = await POST(`/users/invitations/send/`, { athlete: foundUser.id });
+
             if (res.ok) {
                 setInvited(true);
             } else {
-                const data = await res.json();
-                alert(data.error || data.message || "Failed to send invitation");
+                // check common error keys
+                const errorMessage =
+                    res.data?.non_field_errors?.[0] || // DRF's ValidationError
+                    res.data?.detail ||                // DRF's PermissionDenied/NotFound
+                    "Failed to send invitation";
+
+                alert(errorMessage);
             }
         } catch (err) {
             console.error(err);
@@ -62,6 +70,8 @@ export default function FindTrainerPage() {
             setInviting(false);
         }
     }
+
+
 
     return (
         <div className="p-6 max-w-lg mx-auto">
@@ -92,13 +102,12 @@ export default function FindTrainerPage() {
                         <button
                             onClick={handleInvitation}
                             disabled={inviting || invited}
-                            className={`px-4 py-2 rounded-lg text-white transition ${
-                                invited
-                                    ? "bg-green-500 cursor-default"
-                                    : inviting
+                            className={`px-4 py-2 rounded-lg text-white transition ${invited
+                                ? "bg-green-500 cursor-default"
+                                : inviting
                                     ? "bg-yellow-500 cursor-wait"
                                     : "bg-blue-600 hover:bg-blue-700"
-                            }`}
+                                }`}
                         >
                             {invited ? "Invited" : inviting ? "Inviting..." : "Invite"}
                         </button>

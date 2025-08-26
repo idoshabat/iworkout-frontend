@@ -20,8 +20,8 @@ export default function DrillPage({ params }: { params: Promise<{ id: string }> 
         if (!unwrappedParams.id) return;
         const fetchDrill = async () => {
             setLoading(true);
-            const data = await GET(`/drills/${unwrappedParams.id}`);
-            setDrill(data);
+            const res = await GET(`/drills/${unwrappedParams.id}`);
+            setDrill(res.data);
             setLoading(false);
         };
         fetchDrill();

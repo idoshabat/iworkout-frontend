@@ -1,8 +1,10 @@
-const BASE_URL = "https://iworkout-back.onrender.com"
+// const BASE_URL = "https://iworkout-back.onrender.com"
+const BASE_URL = "http://127.0.0.1:8000"
 
 export async function GET(url: string) {
     const URL = `${BASE_URL}${url}`;
     console.log('Fetching:', URL);
+
     const response = await fetch(URL, {
         method: "GET",
         headers: {
@@ -10,15 +12,24 @@ export async function GET(url: string) {
         },
         credentials: "include", // important for cookies
     });
+
     console.log('Response status:', response.status);
+
     const responseData = await response.json().catch(() => ({})); // parse JSON safely
     console.log('Response data:', responseData);
-    return responseData;
+
+    return {
+        ok: response.ok,       // true/false
+        status: response.status, // numeric status code
+        data: responseData,    // the parsed body
+    };
 }
+
 
 export async function POST(url: string, body: any) {
     const URL = `${BASE_URL}${url}`;
     console.log('Posting to:', URL);
+
     const response = await fetch(URL, {
         method: "POST",
         headers: {
@@ -27,10 +38,18 @@ export async function POST(url: string, body: any) {
         body: JSON.stringify(body),
         credentials: "include", // important for cookies
     });
+
     const responseData = await response.json().catch(() => ({})); // parse JSON safely
-    console.log('Response data::', responseData);
-    return response;
+    console.log('Response status:', response.status);
+    console.log('Response data:', responseData);
+
+    return {
+        ok: response.ok,         // true/false
+        status: response.status, // HTTP status code
+        data: responseData,      // parsed JSON body
+    }; 
 }
+
 
 export async function PATCH(url: string, body: any) {
     const URL = `${BASE_URL}${url}`;
@@ -142,15 +161,15 @@ export async function getCurrentTrainer() {
     return await res.json();
 }
 
-export async function fetchAthlete(userId: string) {
-    const data = await GET(`/users/athletes/${userId}`);
-    return data;
-    // const responseData = await data.json().catch(() => ({})); // parse JSON safely
-    // return responseData;
-};
+// export async function fetchAthlete(userId: string) {
+//     const data = await GET(`/users/athletes/${userId}`);
+//     return data;
+//     // const responseData = await data.json().catch(() => ({})); // parse JSON safely
+//     // return responseData;
+// };
 
-export async function fetchTrainer(userId: string) {
-    const data = await GET(`/users/trainers/${userId}`);
-    const responseData = await data.json().catch(() => ({})); // parse JSON safely
-    return responseData;
-}
+// export async function fetchTrainer(userId: string) {
+//     const data = await GET(`/users/trainers/${userId}`);
+//     const responseData = await data.json().catch(() => ({})); // parse JSON safely
+//     return responseData;
+// }
