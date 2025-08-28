@@ -5,7 +5,7 @@ import { GET, POST } from "../lib/utils";
 import Title from "../components/Title";
 import Link from "next/link";
 import { useUser } from "../lib/UserContext";
-import { Suspense } from 'react'
+import { Suspense } from "react";
 
 
 export default function ProfilePage() {
@@ -15,17 +15,8 @@ export default function ProfilePage() {
     const [foundUser, setFoundUser] = useState<any>(null);
     // const [userSubscriptions, setUserSubscriptions] = useState<any[]>([]);
 
-    // useEffect(() => {
-    //     if (user) {
-    //         setUserSubscriptions(user.athlete_profile.subscriptions.map((sub: any) => sub.plan_id));
-    //     }
-    // }, [user]);
 
-    useEffect(() => {
-        if (user) {
-            console.log('user.athlete_profile.subscriptions:', user.athlete_profile.subscriptions);
-        }
-    }, [user]);
+
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -79,7 +70,8 @@ export default function ProfilePage() {
     ];
 
     return (
-        <Suspense fallback={<h1 className="text-2xl text-center mt-10 text-gray-400">Loading...</h1>}>
+        <Suspense fallback={<h1>Loading...</h1>}>
+
             <div className="flex flex-col items-center p-6">
                 <Title size="lg">👤 Profile</Title>
 
