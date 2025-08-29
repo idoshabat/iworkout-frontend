@@ -1,5 +1,6 @@
 // const BASE_URL = "https://iworkout-back.onrender.com"
 const BASE_URL = "http://127.0.0.1:8000"
+// const BASE_URL = "https://iworkout-back-tjgw.onrender.com"
 
 export async function GET(url: string) {
     const URL = `${BASE_URL}${url}`;
@@ -102,6 +103,7 @@ export async function login(email: string, password: string) {
 
     // parse JSON only once
     const data = await res.json();
+    console.log('Login response:', data);
 
     if (!res.ok) {
         throw new Error(data.detail || "Login failed");

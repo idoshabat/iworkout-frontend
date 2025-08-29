@@ -38,7 +38,10 @@ export default function MyPlansPage() {
   if (loading) return <p className="p-4">Loading plans...</p>;
 
   if (plans.length === 0) {
-    return <p className="p-4">You don’t have any plans yet.</p>;
+    return <>
+      <CreatePlanModal setPlans={setPlans} />
+      <p className="p-4">You don’t have any plans yet.</p>;
+    </>;
   }
 
   return (
