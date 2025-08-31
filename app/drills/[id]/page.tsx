@@ -6,6 +6,7 @@ import { GET } from "@/app/lib/utils";
 import { useSearchParams } from "next/navigation";
 import Button from "@/app/components/Button";
 import Title from "@/app/components/Title";
+import BackButton from "@/app/components/BackButton";
 
 export default function DrillPage({ params }: { params: Promise<{ id: string }> }) {
     const { user } = useUser();
@@ -83,12 +84,8 @@ export default function DrillPage({ params }: { params: Promise<{ id: string }> 
                 </div>
             </div>
 
-            {/* ✅ Show back button only if workoutId exists */}
-            {workoutId && (
-                <div className="mt-6">
-                    <Button onClick={() => window.history.back()}>← Back to Workout</Button>
-                </div>
-            )}
+            
+            <BackButton text="Back to workout"/>
         </div>
     );
 }

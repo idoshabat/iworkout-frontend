@@ -6,6 +6,7 @@ import { useUser } from "@/app/lib/UserContext";
 import AddAthleteToWorkoutModal from "@/app/components/AddAthleteToWorkoutModal";
 import Button from "@/app/components/Button";
 import Title from "@/app/components/Title";
+import BackButton from "@/app/components/BackButton";
 
 export default function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
     const { user } = useUser();
@@ -79,13 +80,15 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
 
             {trainer && showModal && (
                 <AddAthleteToWorkoutModal
-                    user={user}
-                    trainer={trainer}
-                    workout={workout}
-                    onClose={() => setShowModal(false)}
-                    onUpdateWorkout={setWorkout}
+                user={user}
+                trainer={trainer}
+                workout={workout}
+                onClose={() => setShowModal(false)}
+                onUpdateWorkout={setWorkout}
                 />
             )}
+            
+            <BackButton />
         </div>
     );
 }

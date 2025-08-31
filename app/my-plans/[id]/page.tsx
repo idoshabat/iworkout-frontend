@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { GET } from "@/app/lib/utils";
+import { GET, POST } from "@/app/lib/utils";
 import { Workout, Plan, Subscription } from "@/app/lib/types";
 import Link from "next/link";
 import AddWorkoutToPlanModal from "@/app/components/AddWorkoutToPlanModal";
@@ -40,15 +40,48 @@ export default function PlanPage() {
     }
   }
 
+  const handleSubscribe = async () => {
+    try {
+      if (plan) {
+        const res = await POST(`/users/athletes/subscriptions/${plan.id}/`, {});
+        if (res.ok) {
+          alert("Successfully subscribed to the plan!");
+          window.location.reload();
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    try {
+      if (plan) {
+        const res = await POST(`/users/athletes/unsubscriptions/${plan.id}/`, {});
+        if (res.ok) {
+          alert("Successfully unsubscribed from the plan!");
+          window.location.reload();
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (!user) return <p className="p-4">You must be logged in to view this page.</p>;
   if (loading) return <p className="p-4">Loading plan...</p>;
   if (!plan) return <p className="p-4">Plan not found.</p>;
-  if (user.id !== plan.trainer && !plan.subscriptions.map((sub) => sub.athlete_id).includes(user.id)) {
+  if (user.role === "trainer" && user.id !== plan.trainer) {
     return <p className="p-4">You are not authorized to view this plan.</p>;
   }
-
-  // if (!plan.subscriptions.map((sub) => sub.athlete).includes(user.id)) {
-  //   return <p className="p-4">You are not authorized to view this plan.</p>;
-  // }
+  else if (user.role === "athlete" && !plan.subscriptions.map((sub) => sub.active ? sub.athlete_id : null).includes(user.id)) {
+    return (
+      <>
+        <p className="p-4">You are not subscribed to this plan.</p>
+        <button className="mt-6 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition" onClick={() => handleSubscribe()}>Subscribe</button>
+      </>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -65,13 +98,13 @@ export default function PlanPage() {
         </p>
         <p className="mt-1 text-sm text-gray-500">
           Subscribed athletes -{" "}
-          {plan.subscriptions.length > 0 ? plan.subscriptions.map((sub) => sub.athlete).join(", ") : "No athletes subscribed"}
+          {plan.subscriptions.length > 0 ? plan.subscriptions.map((sub) => sub.active ? sub.athlete : null).filter(Boolean).join(", ") : "No athletes subscribed"}
         </p>
       </div>
 
       <div className="flex justify-between items-center mt-6">
         <h2 className="text-xl font-semibold">Workouts in this Plan</h2>
-        <Button onClick={() => setShowModal(true)}>➕ Add Workout</Button>
+        {user.role === "trainer" && <Button onClick={() => setShowModal(true)}>➕ Add Workout</Button>}
       </div>
 
       {plan.workouts.length === 0 ? (
@@ -94,6 +127,13 @@ export default function PlanPage() {
           ))}
         </div>
       )}
+
+      {user.role === "athlete" && <button
+        onClick={handleUnsubscribe}
+        className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+      >
+        Unsubscribe
+      </button>}
 
       {/* Modal */}
       {showModal && (
