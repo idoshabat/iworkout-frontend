@@ -42,6 +42,13 @@ export default function PlanPage() {
 
   if (loading) return <p className="p-4">Loading plan...</p>;
   if (!plan) return <p className="p-4">Plan not found.</p>;
+  if (user.id !== plan.trainer && !plan.subscriptions.map((sub) => sub.athlete_id).includes(user.id)) {
+    return <p className="p-4">You are not authorized to view this plan.</p>;
+  }
+
+  // if (!plan.subscriptions.map((sub) => sub.athlete).includes(user.id)) {
+  //   return <p className="p-4">You are not authorized to view this plan.</p>;
+  // }
 
   return (
     <div className="p-6">

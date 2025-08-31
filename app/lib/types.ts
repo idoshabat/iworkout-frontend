@@ -8,6 +8,7 @@ export type Workout = {
 
 export type Plan = {
   id: number;
+  trainer: string;
   name: string;
   description: string;
   price: string;
@@ -19,6 +20,7 @@ export type Plan = {
 export type Subscription = {
   id: number;
   athlete: string;
+  athlete_id: number;
   plan: Plan;
   start_date: string;
   end_date: string;
