@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { GET, POST } from "../lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 type PlanFormData = {
     name: string;
     description?: string;
     price: number;
-    workouts: number[]; // Array of selected workout IDs
+    workouts: number[];
 };
 
 export default function CreatePlanModal({ setPlans }: { setPlans: (plans: any[]) => void }) {
@@ -17,7 +18,7 @@ export default function CreatePlanModal({ setPlans }: { setPlans: (plans: any[])
     const [workouts, setWorkouts] = useState<any[]>([]);
     const { register, handleSubmit, reset } = useForm<PlanFormData>();
 
-    // Fetch all workouts for the trainer to select
+    // Fetch workouts
     useEffect(() => {
         const fetchWorkouts = async () => {
             const res = await GET("/users/trainers/workouts");
@@ -30,10 +31,7 @@ export default function CreatePlanModal({ setPlans }: { setPlans: (plans: any[])
         try {
             setLoading(true);
             const res = await POST("/users/trainers/plans/", data);
-            console.log('data', data);
-
             if (!res.ok) throw new Error("Failed to create plan");
-
             const plansRes = await GET("/users/trainers/plans");
             alert("Plan created successfully!");
             setPlans(plansRes.data);
@@ -47,93 +45,147 @@ export default function CreatePlanModal({ setPlans }: { setPlans: (plans: any[])
         }
     };
 
+    // Input animation variants
+    const inputVariants = {
+        initial: { opacity: 0.7, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        focus: { scale: 1.02, boxShadow: "0 0 10px #facc15" }, // amber glow
+    };
+
     return (
         <>
-            {/* Button to open modal */}
+            {/* Neon Button */}
             <button
-                className="neon-btn px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-gray-200"
+                className="neon-btn px-6 py-3 bg-gradient-to-r from-amber-400 to-pink-500 text-black rounded-xl font-bold shadow-lg hover:shadow-2xl transition transform hover:scale-105"
                 onClick={() => setIsOpen(true)}
             >
                 + Create Plan
             </button>
 
-            {/* Modal */}
-            {isOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div className="bg-white text-black rounded-2xl p-6 w-full max-w-md shadow-lg">
-                        <h2 className="text-xl font-semibold mb-4">Create Plan</h2>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="bg-gray-900 text-white rounded-3xl p-6 w-full max-w-lg shadow-2xl border border-gray-700"
+                        >
+                            <h2 className="text-2xl font-extrabold text-center mb-6 bg-gradient-to-r from-amber-400 to-pink-500 bg-clip-text text-transparent drop-shadow-lg">
+                                Create Plan
+                            </h2>
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                            {/* Name */}
-                            <div>
-                                <label className="block text-sm font-medium">Name</label>
-                                <input
-                                    {...register("name", { required: true })}
-                                    placeholder="Enter plan name"
-                                    className="w-full border px-3 py-2 rounded-lg"
-                                />
-                            </div>
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                                {/* Name */}
+                                <motion.div
+                                    variants={inputVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    whileFocus="focus"
+                                    transition={{ type: "spring", stiffness: 120 }}
+                                >
+                                    <label className="block text-sm font-semibold mb-1">Plan Name</label>
+                                    <input
+                                        {...register("name", { required: true })}
+                                        placeholder="Enter plan name"
+                                        className="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-400 transition shadow-md"
+                                    />
+                                </motion.div>
 
-                            {/* Price */}
-                            <div>
-                                <label className="block text-sm font-medium">Price (USD)</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    {...register("price", { required: true })}
-                                    placeholder="e.g., 29.99"
-                                    className="w-full border px-3 py-2 rounded-lg"
-                                />
-                            </div>
+                                {/* Price */}
+                                <motion.div
+                                    variants={inputVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    whileFocus="focus"
+                                    transition={{ type: "spring", stiffness: 120, delay: 0.05 }}
+                                >
+                                    <label className="block text-sm font-semibold mb-1">Price (USD)</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        {...register("price", { required: true })}
+                                        placeholder="29.99"
+                                        className="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-400 transition shadow-md"
+                                    />
+                                </motion.div>
 
-                            {/* Description */}
-                            <div>
-                                <label className="block text-sm font-medium">Description</label>
-                                <textarea
-                                    {...register("description")}
-                                    placeholder="Describe the plan..."
-                                    className="w-full border px-3 py-2 rounded-lg"
-                                />
-                            </div>
+                                {/* Description */}
+                                <motion.div
+                                    variants={inputVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    whileFocus="focus"
+                                    transition={{ type: "spring", stiffness: 120, delay: 0.1 }}
+                                >
+                                    <label className="block text-sm font-semibold mb-1">Description</label>
+                                    <textarea
+                                        {...register("description")}
+                                        placeholder="Describe the plan..."
+                                        className="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-400 transition shadow-md"
+                                    />
+                                </motion.div>
 
-                            {/* Select Workouts */}
-                            <div>
-                                <label className="block text-sm font-medium">Workouts</label>
-                                <div className="flex flex-col gap-2 max-h-40 overflow-y-auto border rounded-lg p-2">
-                                    {workouts.map((w) => (
-                                        <label key={w.id} className="flex items-center gap-2">
-                                            <input
-                                                type="checkbox"
-                                                value={w.id}
-                                                {...register("workouts")}
-                                            />
-                                            {w.name}
-                                        </label>
-                                    ))}
+                                {/* Workouts */}
+                                <motion.div
+                                    variants={inputVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    whileFocus="focus"
+                                    transition={{ type: "spring", stiffness: 120, delay: 0.15 }}
+                                >
+                                    <label className="block text-sm font-semibold mb-1">Workouts</label>
+                                    <div className="flex flex-col gap-2 max-h-44 overflow-y-auto border border-gray-700 rounded-xl p-3 bg-gray-800">
+                                        {workouts.map((w) => (
+                                            <motion.label
+                                                key={w.id}
+                                                className="flex items-center gap-2 cursor-pointer hover:text-amber-400 transition"
+                                                whileHover={{ scale: 1.02, textShadow: "0 0 8px #facc15" }}
+                                                transition={{ type: "spring", stiffness: 150 }}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    value={w.id}
+                                                    {...register("workouts")}
+                                                    className="accent-amber-400"
+                                                />
+                                                {w.name}
+                                            </motion.label>
+                                        ))}
+                                    </div>
+                                </motion.div>
+
+                                {/* Buttons */}
+                                <div className="flex justify-end gap-3">
+                                    <motion.button
+                                        type="button"
+                                        onClick={() => setIsOpen(false)}
+                                        whileHover={{ scale: 1.05, boxShadow: "0 0 15px #facc15" }}
+                                        className="px-5 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl font-semibold transition shadow-md"
+                                    >
+                                        Cancel
+                                    </motion.button>
+
+                                    <motion.button
+                                        type="submit"
+                                        disabled={loading}
+                                        whileHover={{ scale: 1.05, boxShadow: "0 0 15px #facc15" }}
+                                        className="px-5 py-2 bg-gradient-to-r from-amber-400 to-pink-500 rounded-xl font-bold shadow-lg transition transform disabled:opacity-50"
+                                    >
+                                        {loading ? "Saving..." : "Save Plan"}
+                                    </motion.button>
                                 </div>
-                            </div>
-
-                            {/* Buttons */}
-                            <div className="flex justify-end space-x-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsOpen(false)}
-                                    className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg cursor-pointer"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg cursor-pointer disabled:opacity-50"
-                                >
-                                    {loading ? "Saving..." : "Save"}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { GET } from "@/app/lib/utils";
 import Link from "next/link";
 import CreatePlanModal from "../components/CreatePlanModal";
+import Title from "../components/Title";
 
 type Plan = {
   id: number;
@@ -67,9 +68,9 @@ export default function MyPlansPage() {
   // 3️⃣ Success state
   return (
     <div className="p-6">
-      <h1 className="text-4xl font-extrabold mb-8 text-center bg-gradient-to-r from-amber-400 to-pink-500 bg-clip-text text-transparent drop-shadow-lg">
+      <Title size="lg">
         🌟 My Training Plans
-      </h1>
+      </Title>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {plans.map((plan) => (
