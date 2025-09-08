@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/app/lib/utils";
 import { useUser } from "@/app/lib/UserContext";
+import Title from "../components/Title";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -30,37 +31,39 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black p-4">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-950 to-gray-900 p-4">
             <form
                 onSubmit={handleSubmit}
-                className="bg-white text-black shadow-2xl rounded-3xl p-8 w-full max-w-md space-y-6"
+                className="bg-gray-900 text-white shadow-2xl rounded-3xl p-8 w-full max-w-md space-y-6 border border-gray-800"
             >
-                <h1 className="text-3xl font-bold text-center mb-4">Login</h1>
+                <Title size="lg">Login</Title>
 
                 {error && (
-                    <p className="text-red-600 text-center font-medium">{error}</p>
+                    <p className="text-red-500 text-center font-medium animate-pulse">
+                        {error}
+                    </p>
                 )}
 
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium">Email</label>
+                <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold">Email</label>
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="example@mail.com"
-                        className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
                         required
                     />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium">Password</label>
+                <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold">Password</label>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
                         required
                     />
                 </div>
@@ -68,13 +71,16 @@ export default function LoginPage() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition disabled:opacity-50 cursor-pointer"
+                    className="neon-btn w-full py-3 cursor-pointer"
                 >
                     {loading ? "Logging in..." : "Login"}
                 </button>
 
-                <p className="text-center text-gray-500 text-sm mt-2">
-                    Don't have an account? <a href="/signup" className="text-blue-600 cursor-pointer">Sign up here</a>
+                <p className="text-center text-gray-400 text-sm mt-2">
+                    Don't have an account?{" "}
+                    <a href="/signup" className="text-amber-400 font-semibold hover:underline">
+                        Sign up here
+                    </a>
                 </p>
             </form>
         </div>

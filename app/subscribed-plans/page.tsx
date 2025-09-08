@@ -7,18 +7,35 @@ import Link from 'next/link';
 export default function SubscribedPlansPage() {
     const [activePlans, setActivePlans] = useState<Plan[]>([]);
     const [inactivePlans, setInactivePlans] = useState<Plan[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchPlans() {
-            const activeResponse = await GET('/users/athletes/active-subscriptions/');
-            const inactiveResponse = await GET('/users/athletes/not-active-subscriptions/');
-            
-            setActivePlans(activeResponse.data);
-            setInactivePlans(inactiveResponse.data);
+            try {
+                const activeResponse = await GET('/users/athletes/active-subscriptions/');
+                const inactiveResponse = await GET('/users/athletes/not-active-subscriptions/');
+                setActivePlans(activeResponse.data || []);
+                setInactivePlans(inactiveResponse.data || []);
+            } catch (err) {
+                console.error("Failed to fetch subscriptions:", err);
+            } finally {
+                setLoading(false);
+            }
         }
 
         fetchPlans();
     }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+                <div className="flex flex-col items-center space-y-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500"></div>
+                    <p className="text-gray-400">Loading your subscriptions...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-950 px-6 py-10">
@@ -47,6 +64,9 @@ export default function SubscribedPlansPage() {
                                         >
                                             {plan.name}
                                         </Link>
+                                        <p className="mt-2 text-gray-400 text-sm">
+                                            Trainer - {plan.trainer_name || "No trainer assigned"}
+                                        </p>
                                         <p className="mt-2 text-gray-400 text-sm">
                                             {plan.description || "No description available"}
                                         </p>
@@ -86,6 +106,9 @@ export default function SubscribedPlansPage() {
                                         <span className="text-xl font-semibold text-red-400 block">
                                             {plan.name}
                                         </span>
+                                        <p className="mt-2 text-gray-400 text-sm">
+                                            Trainer - {plan.trainer_name || "No trainer assigned"}
+                                        </p>
                                         <p className="mt-2 text-gray-400 text-sm">
                                             {plan.description || "No description available"}
                                         </p>

@@ -5,8 +5,10 @@ import { useState } from "react";
 import AthleteDisplay from "../components/AthleteDispaly";
 import Error from "../components/Error";
 import Title from "../components/Title";
+import { useUser } from "../lib/UserContext";
 
 export default function FindTrainerPage() {
+    const { user } = useUser();
     const [email, setEmail] = useState("");
     const [foundUser, setFoundUser] = useState<any>(null);
     const [athlete, setAthlete] = useState<any>(null);
@@ -20,24 +22,31 @@ export default function FindTrainerPage() {
 
         try {
             const res = await GET(`/users/get-user-by-email/?email=${email}`);
-            const user = res.data;
-            if (!user.id) {
+            const foundUser = res.data;
+            if (!foundUser.id) {
                 setError(true);
                 setFoundUser(null);
                 return;
             }
 
-            if (user.role === "athlete") {
+            if (foundUser.role === "athlete") {
                 // const athleteData = await fetchAthlete(user.id);
-                const athleteData = user.athlete_profile;
+                const athleteData = foundUser.athlete_profile;
                 setAthlete(athleteData);
             } else {
                 setAthlete(null);
             }
 
             setError(false);
-            setFoundUser(user);
-            setInvited(false);
+            setFoundUser(foundUser);
+            const trainerIds = foundUser?.athlete_profile?.trainers?.map((trainer: any) => trainer.id) || [];
+            console.log('Trainer IDs:', trainerIds);
+            console.log('User ID',user.id);
+            if (trainerIds.includes(user.id)) {
+                setInvited(true);
+            } else {
+                setInvited(false);
+            }
         } catch (err) {
             console.error("Error fetching user:", err);
             setFoundUser(null);
@@ -51,7 +60,6 @@ export default function FindTrainerPage() {
 
         try {
             const res = await POST(`/users/invitations/send/`, { athlete: foundUser.id });
-
             if (res.ok) {
                 setInvited(true);
             } else {

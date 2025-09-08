@@ -56,7 +56,7 @@ export async function PATCH(url: string, body: any) {
     const URL = `${BASE_URL}${url}`;
     console.log('Patching to:', URL);
     const response = await fetch(URL, {
-        method: "PATCH",
+        method: "PATCH", 
         headers: {
             "Content-Type": "application/json",
         },
@@ -65,7 +65,11 @@ export async function PATCH(url: string, body: any) {
     });
     const responseData = await response.json().catch(() => ({})); // parse JSON safely
     console.log('Response data::', responseData);
-    return response;
+    return {
+        ok: response.ok,         // true/false
+        status: response.status, // HTTP status code
+        data: responseData,      // parsed JSON body
+    }; 
 }
 
 export async function DELETE(url: string) {

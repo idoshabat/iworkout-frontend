@@ -51,7 +51,7 @@ export default function CreateWorkoutModal({ userId, setWorkouts }: { userId: st
         <>
             {/* Button to open modal */}
             <button
-                className="px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-gray-200"
+                className="neon-btn px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-gray-200"
                 onClick={() => setIsOpen(true)}
             >
                 + Create Workout

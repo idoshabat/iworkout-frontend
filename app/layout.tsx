@@ -4,7 +4,10 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import { AuthProvider } from "./lib/auth-context";
 import {UserProvider} from "./lib/UserContext";
+import { Orbitron, Assistant } from "next/font/google";
 
+const orbitron = Orbitron({ subsets: ["latin"], weight: ["500", "700"] });
+const assistant = Assistant({ subsets: ["latin"], weight: ["400", "700"] });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +27,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="he" >
-            <body>
+            <body className={` ${assistant.className}`}>
                 <UserProvider>
                     <Navbar />
                     {children}

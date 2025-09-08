@@ -26,6 +26,7 @@ export default function FindTrainerPage() {
                 return;
             }
 
+
             // Ensure the user is a trainer
             if (user.role !== "trainer") {
                 setError(true);
@@ -35,7 +36,18 @@ export default function FindTrainerPage() {
 
             setError(false);
             setFoundUser(user);
-            setInvited(false);
+            console.log('user',user);
+            console.log('Found user:', foundUser?.athlete_profile?.trainers);
+
+            if (
+                foundUser?.athlete_profile?.trainers?.some(
+                    (trainer: any) => trainer.id === user.id
+                )
+            ) {
+                setInvited(true);
+            } else {
+                setInvited(false);
+            }
         } catch (err) {
             console.error("Error fetching user:", err);
             setFoundUser(null);
@@ -92,13 +104,12 @@ export default function FindTrainerPage() {
                         <button
                             onClick={handleInvitation}
                             disabled={inviting || invited}
-                            className={`px-4 py-2 rounded-lg text-white transition ${
-                                invited
+                            className={`px-4 py-2 rounded-lg text-white transition ${invited
                                     ? "bg-green-500 cursor-default"
                                     : inviting
-                                    ? "bg-yellow-500 cursor-wait"
-                                    : "bg-blue-600 hover:bg-blue-700"
-                            }`}
+                                        ? "bg-yellow-500 cursor-wait"
+                                        : "bg-blue-600 hover:bg-blue-700"
+                                }`}
                         >
                             {invited ? "Invited" : inviting ? "Inviting..." : "Invite"}
                         </button>

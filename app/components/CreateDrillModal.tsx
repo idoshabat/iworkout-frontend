@@ -66,7 +66,7 @@ export default function CreateDrillModal({ userId, setDrills }: { userId: string
   return (
     <>
       <button
-        className="px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-gray-200"
+        className="neon-btn px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-gray-200"
         onClick={() => setIsOpen(true)}
       >
         + Create Drill

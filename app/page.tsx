@@ -3,79 +3,119 @@
 import { useUser } from '@/app/lib/UserContext';
 import Title from './components/Title';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function Home() {
   const { user } = useUser();
 
-  return (
-    <div className="p-6 flex flex-col items-center text-center">
-      {/* Hero Section */}
-      <Title size="lg" subtitle="Your personal workout companion">
-        Welcome {user ? `${user.first_name} the ${user.role}` : "Guest"}
-      </Title>
+  // Generate drifting particles dynamically
+  useEffect(() => {
+    const container = document.getElementById("particles");
+    if (container) {
+      for (let i = 0; i < 25; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        particle.style.left = Math.random() * 100 + "vw";
+        particle.style.animationDuration = 8 + Math.random() * 8 + "s";
+        container.appendChild(particle);
+      }
+    }
+  }, []);
 
-      {/* If no user is logged in */}
+  return (
+    <div className="p-10 flex flex-col items-center text-center relative z-10">
+      {/* Background particles */}
+      <div id="particles" className="absolute inset-0 -z-10"></div>
+
+      {/* Floating Dumbbell (SVG) */}
+      <svg
+        className="holo-dumbbell"
+        viewBox="0 0 64 64"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect x="12" y="22" width="8" height="20" rx="2" fill="#00f0ff"/>
+        <rect x="44" y="22" width="8" height="20" rx="2" fill="#00f0ff"/>
+        <rect x="20" y="28" width="24" height="8" rx="2" fill="#00f0ff"/>
+      </svg>
+
+      {/* Hero Section */}
+      <div className="max-w-3xl mx-auto mb-16">
+        <Title size="lg" subtitle="Your futuristic fitness companion">
+          <span className="text-5xl font-extrabold bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-yellow-400 bg-clip-text text-transparent drop-shadow-lg animate-pulse">
+            Welcome {user ? `${user.first_name} the ${user.role}` : "Guest"}
+          </span>
+        </Title>
+        <p className="text-gray-300 mt-6 text-lg leading-relaxed">
+          {user
+            ? "Level up your training with data-driven workouts, AI insights, and holographic vibes ✨"
+            : "Track workouts, connect with trainers, and unleash your fitness potential."}
+        </p>
+      </div>
+
+      {/* No user buttons */}
       {!user && (
-        <div className="mt-6 space-y-4">
-          <p className="text-gray-400 text-lg">
-            Join Iworkout to track workouts, connect with trainers, and improve your fitness.
-          </p>
-          <div className="flex gap-6 justify-center">
-            <Link
-              href="/signup"
-              className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg"
-            >
-              Get Started
-            </Link>
-            <Link
-              href="/login"
-              className="px-6 py-3 border border-white hover:bg-gray-800 text-white rounded-xl"
-            >
-              Login
-            </Link>
+        <div className="flex gap-6 justify-center mt-8">
+          <Link href="/signup" className="neon-btn">
+            🚀 Get Started
+          </Link>
+          <Link href="/login" className="neon-btn">
+            🔑 Login
+          </Link>
+        </div>
+      )}
+
+      {/* Athlete Dashboard */}
+      {user?.role === 'athlete' && (
+        <div className="mt-12 grid gap-10 max-w-4xl w-full sm:grid-cols-2">
+          <div className="holo-card">
+            <div className="hover:scale-105 transition-transform cursor-pointer">
+              <Link href="/workouts">
+                <h2 className="text-2xl font-bold text-cyan-400">📋 My Workouts</h2>
+                <p className="text-gray-400 mt-2">
+                  Track your history with futuristic precision.
+                </p>
+              </Link>
+            </div>
+          </div>
+
+          <div className="holo-card">
+            <div className="hover:scale-105 transition-transform cursor-pointer">
+              <Link href="/subscribed-plans">
+                <h2 className="text-2xl font-bold text-fuchsia-400">👤 My Plans</h2>
+                <p className="text-gray-400 mt-2">
+                  View and upgrade your fitness plans.
+                </p>
+              </Link>
+            </div>
           </div>
         </div>
       )}
 
-      {/* If Athlete is logged in */}
-      {user?.role === 'athlete' && (
-        <div className="mt-10 grid gap-6 max-w-xl w-full">
-          <Link
-            href="/workouts"
-            className="p-6 bg-gray-900 hover:bg-gray-800 rounded-xl shadow-lg"
-          >
-            <h2 className="text-xl font-semibold text-white">📋 My Workouts</h2>
-            <p className="text-gray-400 mt-2">Track and view your workout history.</p>
-          </Link>
-
-          <Link
-            href="/invitations"
-            className="p-6 bg-gray-900 hover:bg-gray-800 rounded-xl shadow-lg"
-          >
-            <h2 className="text-xl font-semibold text-white">✉️ Invitations</h2>
-            <p className="text-gray-400 mt-2">See your trainer invitations and connections.</p>
-          </Link>
-        </div>
-      )}
-
-      {/* If Trainer is logged in */}
+      {/* Trainer Dashboard */}
       {user?.role === 'trainer' && (
-        <div className="mt-10 grid gap-6 max-w-xl w-full">
-          <Link
-            href="/my-athletes"
-            className="p-6 bg-gray-900 hover:bg-gray-800 rounded-xl shadow-lg"
-          >
-            <h2 className="text-xl font-semibold text-white">🏋️ My Athletes</h2>
-            <p className="text-gray-400 mt-2">Manage your athletes and track their progress.</p>
-          </Link>
+        <div className="mt-12 grid gap-10 max-w-4xl w-full sm:grid-cols-2">
+          <div className="holo-card">
+            <div className="hover:scale-105 transition-transform cursor-pointer">
+              <Link href="/my-athletes">
+                <h2 className="text-2xl font-bold text-green-400">🏋️ My Athletes</h2>
+                <p className="text-gray-400 mt-2">
+                  Manage and inspire your athletes with next-gen tools.
+                </p>
+              </Link>
+            </div>
+          </div>
 
-          <Link
-            href="/invitations"
-            className="p-6 bg-gray-900 hover:bg-gray-800 rounded-xl shadow-lg"
-          >
-            <h2 className="text-xl font-semibold text-white">✉️ Invitations</h2>
-            <p className="text-gray-400 mt-2">Send or manage athlete invitations.</p>
-          </Link>
+          <div className="holo-card">
+            <div className="hover:scale-105 transition-transform cursor-pointer">
+              <Link href="/invitations">
+                <h2 className="text-2xl font-bold text-yellow-400">✉️ Invitations</h2>
+                <p className="text-gray-400 mt-2">
+                  Send or manage invites like a pro.
+                </p>
+              </Link>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -29,7 +29,7 @@ export default function Title({
 
   return (
     <div className={`my-6 ${alignClasses[align]}`}>
-      <h1 className={`${sizeClasses[size]} font-bold text-white`}>
+      <h1 className={`${sizeClasses[size]} font-extrabold mb-10 text-center bg-gradient-to-r from-[#6e00ff] to-[#00fff7] bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(110,0,255,0.7)] `}>
         {children}
       </h1>
       {subtitle && (
