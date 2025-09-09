@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { GET, POST } from "../lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import ProgressBar from "./ProgressBar";
+import Toast from "./Toast";
 import CloudinaryVideoPicker from "./CloudinaryVideoPicker";
 
 type DrillFormData = {
@@ -13,12 +16,27 @@ type DrillFormData = {
   trainer?: string;
 };
 
-export default function CreateDrillModal({ userId, setDrills }: { userId: string; setDrills: (drills: any[]) => void }) {
+type DrillStepFields = keyof DrillFormData | "video";
+
+export default function CreateDrillModal({
+  userId,
+  setDrills,
+}: {
+  userId: string;
+  setDrills: (drills: any[]) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, reset, watch } = useForm<DrillFormData>();
+  const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoPublicId, setVideoPublicId] = useState<string | null>(null);
+
+  const { register, handleSubmit, reset, getValues, watch } = useForm<DrillFormData>({
+    mode: "onChange",
+    defaultValues: { name: "", description: "", sport: "", category: "" },
+  });
 
   const sportTypes = ["Soccer", "Basketball", "Tennis"];
   const categoryTypes: Record<string, string[]> = {
@@ -29,144 +47,242 @@ export default function CreateDrillModal({ userId, setDrills }: { userId: string
 
   const selectedSport = watch("sport");
 
+  const steps = [
+    { label: "Drill Name", field: "name", placeholder: "Enter drill name", type: "text" },
+    { label: "Sport", field: "sport", placeholder: "Select sport", type: "select", options: sportTypes },
+    {
+      label: "Category",
+      field: "category",
+      placeholder: "Select category",
+      type: "select",
+      options: [], // dynamically replaced
+    },
+    { label: "Description", field: "description", placeholder: "Describe the drill...", type: "textarea" },
+    { label: "Video (optional)", field: "video", placeholder: "Upload video", type: "video" },
+  ];
+
   const handleUploaded = ({ url, public_id }: { url: string; public_id: string }) => {
     setVideoUrl(url);
     setVideoPublicId(public_id);
   };
 
   const onSubmit = async (data: DrillFormData) => {
+    const payload = {
+      ...data,
+      trainer: userId,
+      video_url: videoUrl,
+      video_public_id: videoPublicId,
+    };
+
     try {
       setLoading(true);
-      const payload = {
-        ...data,
-        trainer: userId,
-        video_url: videoUrl,
-        video_public_id: videoPublicId,
-      };
-
       const res = await POST("/drills/", payload);
-      alert("✅ Drill created successfully!");
+      if (!res.ok) throw new Error("Failed to create drill");
 
       const res2 = await GET(`/users/trainers/drills`);
-      const drills = res2.data;
-      setDrills(drills);
+      setDrills(res2.data);
 
-      reset();
-      setVideoUrl(null);
-      setVideoPublicId(null);
-      setIsOpen(false);
+      setToast({ message: "✅ Drill created successfully!", type: "success" });
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to create drill");
+      setToast({ message: "❌ Failed to create drill", type: "error" });
     } finally {
       setLoading(false);
+      setIsOpen(false);
+      setTimeout(() => {
+        reset({ name: "", description: "", sport: "", category: "" });
+        setVideoUrl(null);
+        setVideoPublicId(null);
+        setStep(0);
+        setDirection(0);
+      }, 200);
     }
+  };
+
+  const nextStep = () => {
+    const field = steps[step].field as DrillStepFields;
+    const value = field === "video" ? videoUrl : getValues(field);
+
+    if ((field === "category" && !value) || (field !== "description" && field !== "video" && !value)) {
+      setToast({ message: "⚠️ Please fill this field before continuing", type: "error" });
+      return;
+    }
+
+    setDirection(1);
+    setStep((prev) => Math.min(prev + 1, steps.length - 1));
+  };
+
+  const prevStep = () => {
+    setDirection(-1);
+    setStep((prev) => Math.max(prev - 1, 0));
+  };
+
+  const variants = {
+    enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0, position: "absolute" }),
+    center: { x: 0, opacity: 1, position: "relative" },
+    exit: (dir: number) => ({ x: dir < 0 ? 300 : -300, opacity: 0, position: "absolute" }),
   };
 
   return (
     <>
       <button
-        className="neon-btn px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-gray-200"
-        onClick={() => setIsOpen(true)}
+        className="neon-btn px-6 py-3 bg-gradient-to-r from-amber-400 to-pink-500 text-black rounded-xl font-bold shadow-lg hover:shadow-2xl transition transform hover:scale-105"
+        onClick={() => {
+          reset({ name: "", description: "", sport: "", category: "" });
+          setStep(0);
+          setDirection(0);
+          setToast(null);
+          setVideoUrl(null);
+          setVideoPublicId(null);
+          setIsOpen(true);
+        }}
       >
         + Create Drill
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
-          <div className="bg-white text-black rounded-2xl p-6 w-full max-w-md shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Create Drill</h2>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-gray-900 text-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-gray-700 overflow-hidden relative"
+            >
+              <h2 className="text-2xl font-extrabold text-center mb-4 bg-gradient-to-r from-amber-400 to-pink-500 bg-clip-text text-transparent drop-shadow-lg">
+                Create Drill
+              </h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium">Name</label>
-                <input
-                  {...register("name", { required: true })}
-                  placeholder="Enter drill name"
-                  className="w-full border px-3 py-2 rounded-lg"
-                />
-              </div>
+              <ProgressBar step={step} total={steps.length} />
 
-              {/* Sport */}
-              <div>
-                <label className="block text-sm font-medium">Sport</label>
-                <select
-                  {...register("sport", { required: true })}
-                  className="w-full border px-3 py-2 rounded-lg"
-                >
-                  <option value="">Select a sport</option>
-                  {sportTypes.map((sport) => (
-                    <option key={sport} value={sport.toLowerCase()}>
-                      {sport}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <form onSubmit={(e) => e.preventDefault()} className="flex flex-col items-center justify-center space-y-6 relative h-[400px]">
+                <AnimatePresence custom={direction} mode="wait">
+                  {step < steps.length && (
+                    <motion.div
+                      key={step}
+                      custom={direction}
+                      variants={variants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={{ duration: 0.4 }}
+                      className="w-full flex flex-col gap-4 absolute top-0 left-0"
+                    >
+                      <span className="text-lg font-bold text-amber-400">{steps[step].label}</span>
 
-              {/* Category */}
-              <div>
-                <label className="block text-sm font-medium">Category</label>
-                <select
-                  {...register("category", { required: true })}
-                  className="w-full border px-3 py-2 rounded-lg"
-                  disabled={!selectedSport}
-                >
-                  <option value="">
-                    {selectedSport ? "Select a category" : "Select a sport first"}
-                  </option>
-                  {(categoryTypes[selectedSport as keyof typeof categoryTypes] || []).map(
-                    (category) => (
-                      <option key={category} value={category.toLowerCase()}>
-                        {category}
-                      </option>
-                    )
+                      {steps[step].type === "textarea" ? (
+                        <textarea
+                          {...register(steps[step].field as keyof DrillFormData)}
+                          placeholder={steps[step].placeholder}
+                          className="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-400 transition shadow-md"
+                        />
+                      ) : steps[step].type === "select" ? (
+                        <select
+                          {...register(steps[step].field as keyof DrillFormData)}
+                          className="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 transition shadow-md"
+                        >
+                          <option value="">
+                            {steps[step].field === "category"
+                              ? selectedSport
+                                ? "Select a category"
+                                : "Select a sport first"
+                              : steps[step].placeholder}
+                          </option>
+                          {(steps[step].field === "category"
+                            ? categoryTypes[selectedSport as keyof typeof categoryTypes] || []
+                            : steps[step].options || []
+                          ).map((option) => (
+                            <option key={option} value={option.toLowerCase()}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : steps[step].type === "video" ? (
+                        <div className="space-y-2 w-full">
+                          <CloudinaryVideoPicker onUploaded={handleUploaded} />
+                          {videoUrl && (
+                            <video controls className="w-full mt-2 rounded-xl">
+                              <source src={videoUrl} />
+                            </video>
+                          )}
+                        </div>
+                      ) : (
+                        <input
+                          type="text"
+                          {...register(steps[step].field as keyof DrillFormData)}
+                          placeholder={steps[step].placeholder}
+                          className="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-400 transition shadow-md"
+                        />
+                      )}
+                    </motion.div>
                   )}
-                </select>
-              </div>
+                </AnimatePresence>
 
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium">Description</label>
-                <textarea
-                  {...register("description")}
-                  placeholder="Describe the drill..."
-                  className="w-full border px-3 py-2 rounded-lg"
-                />
-              </div>
+                <div className="flex justify-between w-full absolute bottom-0 left-0 p-4">
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    disabled={step === 0}
+                    className="px-5 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl font-semibold transition disabled:opacity-50"
+                  >
+                    Back
+                  </button>
 
-              {/* Video Upload */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">Video (optional)</label>
-                <CloudinaryVideoPicker onUploaded={handleUploaded} />
-                {videoUrl && (
-                  <video controls className="w-full mt-2 rounded-xl">
-                    <source src={videoUrl} />
-                  </video>
-                )}
-              </div>
+                  {step < steps.length - 1 ? (
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="px-5 py-2 bg-gradient-to-r from-amber-400 to-pink-500 rounded-xl font-bold shadow-lg hover:shadow-2xl transition transform hover:scale-105"
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSubmit(onSubmit)}
+                      disabled={loading}
+                      className="px-5 py-2 bg-gradient-to-r from-amber-400 to-pink-500 rounded-xl font-bold shadow-lg hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50"
+                    >
+                      {loading ? "Saving..." : "Create Drill"}
+                    </button>
+                  )}
+                </div>
 
-              {/* Buttons */}
-              <div className="flex justify-end space-x-2">
                 <button
                   type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg cursor-pointer"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setTimeout(() => {
+                      reset({ name: "", description: "", sport: "", category: "" });
+                      setVideoUrl(null);
+                      setVideoPublicId(null);
+                      setStep(0);
+                      setDirection(0);
+                      setToast(null);
+                    }, 200);
+                  }}
+                  className="mt-2 text-sm text-gray-400 hover:text-amber-400 transition absolute bottom-0 right-0 p-4"
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg cursor-pointer disabled:opacity-50"
-                >
-                  {loading ? "Saving..." : "Save"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Toast
+        message={toast?.message || ""}
+        type={toast?.type || "success"}
+        isVisible={!!toast}
+        onClose={() => setToast(null)}
+      />
     </>
   );
 }
