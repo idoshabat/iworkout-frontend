@@ -73,7 +73,7 @@ export default function DrillsPage() {
             <>
               <Title size="md">Drills from my coaches</Title>
               <div className="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {drills.map((drill) => (
+                {drills.length > 0 && drills.map((drill) => (
                   <div
                     key={drill.id}
                     className="p-6 bg-[#121028]/40 backdrop-blur-lg border border-[#6e00ff]/50 rounded-2xl shadow-lg hover:shadow-[#00fff7]/60 transition transform hover:scale-105"

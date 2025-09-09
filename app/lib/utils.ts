@@ -85,13 +85,17 @@ export async function DELETE(url: string) {
     });
 
     // parse JSON only once
-    const data = await response.json();
+    const responseData = await response.json().catch(() => ({})); // parse JSON safely
 
     if (!response.ok) {
-        throw new Error(data.detail || "Login failed");
+        throw new Error(responseData.detail || "Login failed");
     }
 
-    return data; // data.user and data.detail are available here
+    return {
+        ok: response.ok,         // true/false
+        status: response.status, // HTTP status code
+        data: responseData,      // parsed JSON body
+    };  // data.user and data.detail are available here
 }
 
 export async function login(email: string, password: string) {

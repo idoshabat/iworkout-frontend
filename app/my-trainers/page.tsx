@@ -42,6 +42,20 @@ export default function MyTrainersPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0e0b22] to-[#050317] text-center">
         <Title size="md" >You don’t have a trainer yet</Title>
+        <div className="flex flex-row gap-4 mb-6">
+          <Link
+            href="/find-trainer"
+            className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#6e00ff] to-[#00fff7] text-white font-semibold shadow-lg hover:shadow-[#00fff7]/50 hover:scale-105 transition"
+          >
+            Find Trainer
+          </Link>
+          <Link
+            href="/invitations"
+            className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#00fff7] to-[#6e00ff] text-white font-semibold shadow-lg hover:shadow-[#6e00ff]/50 hover:scale-105 transition"
+          >
+            Invitations
+          </Link>
+        </div>
         <p className="text-gray-400 mt-2 text-lg">
           Ask your trainer to add you or check your invitations.
         </p>

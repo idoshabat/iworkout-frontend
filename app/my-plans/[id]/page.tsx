@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { GET, POST, PATCH } from "@/app/lib/utils";
+import { GET, POST, PATCH, DELETE } from "@/app/lib/utils";
 import { Workout, Plan } from "@/app/lib/types";
 import Link from "next/link";
 import AddWorkoutToPlanModal from "@/app/components/AddWorkoutToPlanModal";
 import { useUser } from "@/app/lib/UserContext";
 import Button from "@/app/components/Button";
+import Toast from "@/app/components/Toast";
+import ConfirmModal from "@/app/components/ConfirmModal";
 
 export default function PlanPage() {
   const { user } = useUser();
@@ -23,6 +25,13 @@ export default function PlanPage() {
     is_active: true,
     workouts: [] as number[],
   });
+
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error"; isVisible: boolean }>({ message: "", type: "success", isVisible: false });
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type, isVisible: true });
+  };
 
   // Fetch plan
   useEffect(() => {
@@ -77,29 +86,28 @@ export default function PlanPage() {
       if (plan) {
         const res = await POST(`/users/athletes/subscriptions/${plan.id}/`, {});
         if (res.ok) {
-          alert("Successfully subscribed to the plan!");
+          showToast("Successfully subscribed to the plan!", "success");
           window.location.reload();
         }
       }
     } catch (error) {
       console.error(error);
+      showToast("Subscription failed.", "error");
     }
   };
 
   const handleUnsubscribe = async () => {
     try {
       if (plan) {
-        const res = await POST(
-          `/users/athletes/unsubscriptions/${plan.id}/`,
-          {}
-        );
+        const res = await POST(`/users/athletes/unsubscriptions/${plan.id}/`, {});
         if (res.ok) {
-          alert("Successfully unsubscribed from the plan!");
+          showToast("Successfully unsubscribed from the plan!", "success");
           window.location.reload();
         }
       }
     } catch (error) {
       console.error(error);
+      showToast("Unsubscription failed.", "error");
     }
   };
 
@@ -111,10 +119,11 @@ export default function PlanPage() {
         const updated = res.data;
         setPlan(updated);
         setShowEdit(false);
-        alert("Plan updated successfully!");
+        showToast("Plan updated successfully!", "success");
       }
     } catch (error) {
       console.error("Update failed:", error);
+      showToast("Failed to update plan.", "error");
     }
   };
 
@@ -157,23 +166,29 @@ export default function PlanPage() {
 
   return (
     <div className="p-6">
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+      />
+
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-bold">{plan.name}</h1>
           <p className="text-gray-600 mt-1">{plan.description}</p>
         </div>
         {user.role === "trainer" && user.id === plan.trainer && (
-          <Button onClick={() => setShowEdit(true)}>✏️ Edit</Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setShowEdit(true)}>✏️ Edit</Button>
+            <Button onClick={() => setConfirmDeleteOpen(true)}>🗑️ Delete</Button>
+          </div>
         )}
       </div>
 
       <div className="mt-4">
         <p className="font-medium">💰 Price: {plan.price} USD</p>
-        <p
-          className={`mt-1 ${
-            plan.is_active ? "text-green-600" : "text-red-600"
-          }`}
-        >
+        <p className={`mt-1 ${plan.is_active ? "text-green-600" : "text-red-600"}`}>
           {plan.is_active ? "Active" : "Inactive"}
         </p>
         <p className="mt-1 text-sm text-gray-500">
@@ -203,10 +218,7 @@ export default function PlanPage() {
               key={w.id}
               className="rounded-xl border p-4 shadow-sm hover:shadow-md transition"
             >
-              <Link
-                href={`/workouts/${w.id}`}
-                className="text-lg font-semibold"
-              >
+              <Link href={`/workouts/${w.id}`} className="text-lg font-semibold">
                 {w.name}
               </Link>
               <p className="text-sm text-gray-600">{w.description}</p>
@@ -242,26 +254,20 @@ export default function PlanPage() {
             <input
               type="text"
               value={editData.name}
-              onChange={(e) =>
-                setEditData({ ...editData, name: e.target.value })
-              }
+              onChange={(e) => setEditData({ ...editData, name: e.target.value })}
               placeholder="Plan Name"
               className="w-full mb-2 p-2 border rounded"
             />
             <textarea
               value={editData.description}
-              onChange={(e) =>
-                setEditData({ ...editData, description: e.target.value })
-              }
+              onChange={(e) => setEditData({ ...editData, description: e.target.value })}
               placeholder="Description"
               className="w-full mb-2 p-2 border rounded"
             />
             <input
               type="number"
               value={editData.price}
-              onChange={(e) =>
-                setEditData({ ...editData, price: e.target.value })
-              }
+              onChange={(e) => setEditData({ ...editData, price: e.target.value })}
               placeholder="Price"
               className="w-full mb-2 p-2 border rounded"
             />
@@ -270,9 +276,7 @@ export default function PlanPage() {
               <input
                 type="checkbox"
                 checked={editData.is_active}
-                onChange={(e) =>
-                  setEditData({ ...editData, is_active: e.target.checked })
-                }
+                onChange={(e) => setEditData({ ...editData, is_active: e.target.checked })}
               />
               <span>Active</span>
             </label>
@@ -298,16 +302,11 @@ export default function PlanPage() {
                       checked={editData.workouts.includes(w.id)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setEditData({
-                            ...editData,
-                            workouts: [...editData.workouts, w.id],
-                          });
+                          setEditData({ ...editData, workouts: [...editData.workouts, w.id] });
                         } else {
                           setEditData({
                             ...editData,
-                            workouts: editData.workouts.filter(
-                              (wid) => wid !== w.id
-                            ),
+                            workouts: editData.workouts.filter((wid) => wid !== w.id),
                           });
                         }
                       }}
@@ -325,6 +324,30 @@ export default function PlanPage() {
           </div>
         </div>
       )}
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={confirmDeleteOpen}
+        title="Delete Plan"
+        message="Are you sure you want to delete this plan? This action cannot be undone."
+        onCancel={() => setConfirmDeleteOpen(false)}
+        onConfirm={async () => {
+          setConfirmDeleteOpen(false);
+          if (!plan) return;
+          try {
+            const res = await DELETE(`/users/trainers/plans/${plan.id}/`);
+            if (res.ok) {
+              showToast("Plan deleted successfully!", "success");
+              setTimeout(() => (window.location.href = "/my-plans"), 1000);
+            } else {
+              showToast("Failed to delete plan.", "error");
+            }
+          } catch (error) {
+            console.error("Delete failed:", error);
+            showToast("Network error. Try again.", "error");
+          }
+        }}
+      />
     </div>
   );
 }

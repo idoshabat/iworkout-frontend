@@ -1,6 +1,5 @@
-// Toast.tsx
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type ToastProps = {
@@ -11,9 +10,18 @@ type ToastProps = {
 };
 
 export default function Toast({ message, type, isVisible, onClose }: ToastProps) {
+  const toastRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (isVisible) {
-      const timer = setTimeout(onClose, 3000); // auto close after 3s
+      // auto close after 3s
+      const timer = setTimeout(onClose, 3000);
+
+      // scroll into view
+      if (toastRef.current) {
+        toastRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
       return () => clearTimeout(timer);
     }
   }, [isVisible, onClose]);
@@ -22,6 +30,7 @@ export default function Toast({ message, type, isVisible, onClose }: ToastProps)
     <AnimatePresence>
       {isVisible && (
         <motion.div
+          ref={toastRef}
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -50, opacity: 0 }}
