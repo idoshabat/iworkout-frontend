@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
 import { GET, POST } from "../lib/utils";
 import { useState } from "react";
 import AthleteDisplay from "../components/AthleteDispaly";
 import Error from "../components/Error";
 import Title from "../components/Title";
+import Toast from "../components/Toast";
 import { useUser } from "../lib/UserContext";
-import Toast from "../components/Toast"; // 👈 import Toast
 
 export default function FindAthletePage() {
     const { user } = useUser();
@@ -17,22 +17,30 @@ export default function FindAthletePage() {
     const [inviting, setInviting] = useState(false);
     const [invited, setInvited] = useState(false);
 
-    // Toast state
-    const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-    const [isToastVisible, setIsToastVisible] = useState(false);
+    // ✅ Searching state
+    const [searching, setSearching] = useState(false);
 
-    const showToast = (message: string, type: "success" | "error") => {
-        setToast({ message, type });
-        setIsToastVisible(true);
-    };
+    // Toast state
+    const [toast, setToast] = useState<{
+        message: string;
+        type: "success" | "error";
+        isVisible: boolean;
+    }>({ message: "", type: "success", isVisible: false });
+
+    function showToast(message: string, type: "success" | "error" = "success") {
+        setToast({ message, type, isVisible: true });
+    }
 
     async function handleSearch(e: React.FormEvent) {
         e.preventDefault();
         if (!email.trim()) return;
 
+        setSearching(true); // ✅ start searching
+
         try {
             const res = await GET(`/users/get-user-by-email/?email=${email}`);
             const foundUser = res.data;
+
             if (!foundUser.id) {
                 setError(true);
                 setFoundUser(null);
@@ -40,8 +48,7 @@ export default function FindAthletePage() {
             }
 
             if (foundUser.role === "athlete") {
-                const athleteData = foundUser.athlete_profile;
-                setAthlete(athleteData);
+                setAthlete(foundUser.athlete_profile);
             } else {
                 setAthlete(null);
             }
@@ -49,7 +56,9 @@ export default function FindAthletePage() {
             setError(false);
             setFoundUser(foundUser);
 
-            const trainerIds = foundUser?.athlete_profile?.trainers?.map((trainer: any) => trainer.id) || [];
+            // check connection
+            const trainerIds =
+                foundUser?.athlete_profile?.trainers?.map((trainer: any) => trainer.id) || [];
             if (trainerIds.includes(user.id)) {
                 setInvited(true);
             } else {
@@ -59,6 +68,9 @@ export default function FindAthletePage() {
             console.error("Error fetching user:", err);
             setFoundUser(null);
             setError(true);
+            showToast("Failed to search athlete", "error");
+        } finally {
+            setSearching(false); // ✅ stop searching
         }
     }
 
@@ -67,16 +79,21 @@ export default function FindAthletePage() {
         setInviting(true);
 
         try {
-            const res = await POST(`/users/invitations/send/`, { athlete: foundUser.id });
+            const res = await POST(`/users/invitations/send/`, {
+                athlete: foundUser.id,
+            });
             if (res.ok) {
                 setInvited(true);
-                showToast("Invitation sent successfully ✅", "success");
+                showToast("Invitation sent!", "success");
             } else {
-                const errorMessage =
-                    res.data?.non_field_errors?.[0] ||
-                    res.data?.detail ||
-                    "Failed to send invitation";
-                showToast(errorMessage, "error");
+                const data = res.data;
+                showToast(
+                    data.error ||
+                        data.message ||
+                        data.non_field_errors?.[0] ||
+                        "Failed to send invitation",
+                    "error"
+                );
             }
         } catch (err) {
             console.error(err);
@@ -99,13 +116,22 @@ export default function FindAthletePage() {
                     placeholder="Enter athlete's email"
                     className="flex-1 border border-gray-700 px-3 py-2 rounded-lg bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 />
-                <button type="submit" className="neon-btn-blue">
-                    Search
+                <button
+                    type="submit"
+                    className={`neon-btn-light flex items-center gap-2 ${
+                        searching ? "opacity-70 cursor-wait" : ""
+                    }`}
+                    disabled={searching}
+                >
+                    {searching && (
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    )}
+                    {searching ? "Searching..." : "Search"}
                 </button>
             </form>
 
             {/* Result */}
-            {foundUser && athlete && (
+            {foundUser && athlete && !searching && (
                 <div className="flex flex-col gap-4 mt-6 neon-card">
                     <AthleteDisplay user={foundUser} />
                     <div className="flex gap-2 flex-wrap">
@@ -114,7 +140,7 @@ export default function FindAthletePage() {
                             disabled={inviting || invited}
                             className={`px-4 py-2 rounded-lg font-semibold transition ${
                                 invited
-                                    ? "neon-btn-green cursor-default"
+                                    ? "neon-btn-green cursor-wait"
                                     : inviting
                                     ? "neon-btn-yellow cursor-wait"
                                     : "neon-btn-blue"
@@ -132,7 +158,7 @@ export default function FindAthletePage() {
                 </div>
             )}
 
-            {foundUser && !athlete && (
+            {foundUser && !athlete && !searching && (
                 <div className="flex flex-col gap-4 mt-6 text-center neon-card">
                     <p className="text-gray-300">User is not an athlete</p>
                     <button
@@ -144,55 +170,15 @@ export default function FindAthletePage() {
                 </div>
             )}
 
-            {error && <Error message={"User not found"} />}
+            {error && !searching && <Error message={"Athlete not found"} />}
 
             {/* Toast */}
             <Toast
-                message={toast?.message || ""}
-                type={toast?.type || "success"}
-                isVisible={isToastVisible}
-                onClose={() => setIsToastVisible(false)}
+                message={toast.message}
+                type={toast.type}
+                isVisible={toast.isVisible}
+                onClose={() => setToast({ ...toast, isVisible: false })}
             />
-
-            {/* Neon Styles */}
-            <style jsx>{`
-                .neon-card {
-                    background: #111;
-                    border: 1px solid rgba(0, 255, 247, 0.3);
-                    border-radius: 1rem;
-                    padding: 1.5rem;
-                    box-shadow: 0 0 15px rgba(0, 255, 247, 0.2), 0 0 25px rgba(110, 0, 255, 0.2);
-                    transition: transform 0.2s, box-shadow 0.2s;
-                }
-                .neon-card:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 0 25px rgba(0, 255, 247, 0.4), 0 0 35px rgba(110, 0, 255, 0.4);
-                }
-                .neon-btn-blue {
-                    background: linear-gradient(90deg, #6e00ff, #00fff7);
-                    color: white;
-                    font-weight: 600;
-                    text-align: center;
-                    box-shadow: 0 0 8px #6e00ff, 0 0 12px #00fff7;
-                    transition: transform 0.2s, box-shadow 0.2s;
-                    padding: 0.5rem 1.5rem;
-                    border-radius: 0.75rem;
-                }
-                .neon-btn-blue:hover {
-                    transform: scale(1.05);
-                    box-shadow: 0 0 15px #6e00ff, 0 0 25px #00fff7;
-                }
-                .neon-btn-yellow {
-                    background: linear-gradient(90deg, #FFD700, #FFA500);
-                    color: black;
-                    box-shadow: 0 0 8px #FFD700, 0 0 12px #FFA500;
-                }
-                .neon-btn-green {
-                    background: linear-gradient(90deg, #00ff7f, #00c851);
-                    color: black;
-                    box-shadow: 0 0 8px #00ff7f, 0 0 12px #00c851;
-                }
-            `}</style>
         </div>
     );
 }

@@ -15,9 +15,17 @@ body {
 
 /* Gradient animation */
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* --- (keep the rest of the holo-card, neon-btn, dumbbell, particles etc. here) --- */
@@ -34,7 +42,7 @@ body {
   animation: holoGlow 8s linear infinite;
 }
 
-.holo-card > div {
+.holo-card>div {
   background: rgba(14, 11, 34, 0.85);
   backdrop-filter: blur(8px);
   border-radius: 14px;
@@ -43,9 +51,17 @@ body {
 }
 
 @keyframes holoGlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Neon buttons */
@@ -68,6 +84,69 @@ body {
   color: #0e0b22;
   box-shadow: 0 0 25px #00f0ff, 0 0 50px #00f0ff;
   transform: scale(1.05);
+  cursor: pointer;
+
+}
+
+.neon-btn-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #6e00ff, #00fff7);
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(110, 0, 255, 0.6),
+    0 0 20px rgba(0, 255, 247, 0.6);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+
+}
+
+.neon-btn-blue {
+  background: linear-gradient(90deg, #6e00ff, #00fff7);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 0 8px #6e00ff, 0 0 12px #00fff7;
+
+}
+
+.neon-btn-yellow {
+  background: linear-gradient(90deg, #ffd700, #ffa500);
+  color: black;
+  box-shadow: 0 0 8px #ffd700, 0 0 12px #ffa500;
+
+}
+
+.neon-btn-green {
+  background: linear-gradient(90deg, #00ff7f, #00c851);
+  color: black;
+  box-shadow: 0 0 8px #00ff7f, 0 0 12px #00c851;
+
+}
+
+.neon-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(110, 0, 255, 0.8),
+    0 0 25px rgba(0, 255, 247, 0.8);
+}
+
+.neon-card {
+  background: #111;
+  border: 1px solid rgba(0, 255, 247, 0.3);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 0 15px rgba(0, 255, 247, 0.2),
+    0 0 25px rgba(110, 0, 255, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.neon-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px rgba(0, 255, 247, 0.4),
+    0 0 35px rgba(110, 0, 255, 0.4);
 }
 
 /* Floating holographic dumbbell */
@@ -84,8 +163,15 @@ body {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(10deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(10deg);
+  }
 }
 
 /* Particle glow effect */
@@ -100,6 +186,13 @@ body {
 }
 
 @keyframes drift {
-  from { transform: translateY(100vh) translateX(0); opacity: 1; }
-  to { transform: translateY(-10vh) translateX(50px); opacity: 0; }
+  from {
+    transform: translateY(100vh) translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(-10vh) translateX(50px);
+    opacity: 0;
+  }
 }
