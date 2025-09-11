@@ -28,9 +28,6 @@ body {
   }
 }
 
-/* --- (keep the rest of the holo-card, neon-btn, dumbbell, particles etc. here) --- */
-
-
 /* Holographic cards */
 .holo-card {
   position: relative;
@@ -64,75 +61,110 @@ body {
   }
 }
 
-/* Neon buttons */
+/* Base Neon Button style */
 .neon-btn {
   background: transparent;
-  border: 2px solid #00f0ff;
-  color: #00f0ff;
   padding: 0.75rem 2rem;
   border-radius: 9999px;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: bold;
   transition: all 0.3s ease;
-  box-shadow: 0 0 12px #00f0ff, 0 0 20px #00f0ff inset;
   cursor: pointer;
 }
 
-.neon-btn:hover {
+/* Neon button color variants – transparent by default */
+.neon-btn-blue {
+  border: 2px solid #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 12px #00f0ff, 0 0 20px #00f0ff inset;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.neon-btn-blue:hover {
   background: #00f0ff;
   color: #0e0b22;
   box-shadow: 0 0 25px #00f0ff, 0 0 50px #00f0ff;
   transform: scale(1.05);
-  cursor: pointer;
-
 }
 
+.neon-btn-red {
+  border: 2px solid #ff1a1a;
+  color: #ff1a1a;
+  box-shadow: 0 0 12px #ff1a1a, 0 0 20px #ff1a1a inset;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.neon-btn-red:hover {
+  background: #ff1a1a;
+  color: #fff;
+  box-shadow: 0 0 25px #ff1a1a, 0 0 50px #ff1a1a;
+  transform: scale(1.05);
+}
+
+.neon-btn-green {
+  border: 2px solid #00ff7f;
+  color: #00ff7f;
+  box-shadow: 0 0 12px #00ff7f, 0 0 20px #00ff7f inset;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.neon-btn-green:hover {
+  background: #00ff7f;
+  color: #0e0b22;
+  box-shadow: 0 0 25px #00ff7f, 0 0 50px #00ff7f;
+  transform: scale(1.05);
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.neon-btn-yellow {
+  border: 2px solid #ffd700;
+  color: #ffd700;
+  box-shadow: 0 0 12px #ffd700, 0 0 20px #ffd700 inset;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.neon-btn-yellow:hover {
+  background: #ffd700;
+  color: #0e0b22;
+  box-shadow: 0 0 25px #ffd700, 0 0 50px #ffd700;
+  transform: scale(1.05);
+}
+
+/* Optional lighter gradient style */
 .neon-btn-light {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1.5rem;
   border-radius: 0.75rem;
-  background: linear-gradient(90deg, #6e00ff, #00fff7);
-  color: white;
+  background: transparent;
+  border: 2px solid #6e00ff;
+  color: #6e00ff;
   font-weight: 600;
   text-align: center;
   box-shadow: 0 0 10px rgba(110, 0, 255, 0.6),
     0 0 20px rgba(0, 255, 247, 0.6);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-.neon-btn-blue {
+.neon-btn-light:hover {
   background: linear-gradient(90deg, #6e00ff, #00fff7);
   color: white;
-  font-weight: 600;
-  box-shadow: 0 0 8px #6e00ff, 0 0 12px #00fff7;
-
-}
-
-.neon-btn-yellow {
-  background: linear-gradient(90deg, #ffd700, #ffa500);
-  color: black;
-  box-shadow: 0 0 8px #ffd700, 0 0 12px #ffa500;
-
-}
-
-.neon-btn-green {
-  background: linear-gradient(90deg, #00ff7f, #00c851);
-  color: black;
-  box-shadow: 0 0 8px #00ff7f, 0 0 12px #00c851;
-
-}
-
-.neon-btn:hover:not(:disabled) {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(110, 0, 255, 0.8),
-    0 0 25px rgba(0, 255, 247, 0.8);
 }
 
+/* Neon card */
 .neon-card {
   background: #111;
   border: 1px solid rgba(0, 255, 247, 0.3);

@@ -4,6 +4,7 @@ import { GET } from "@/app/lib/utils";
 import Link from "next/link";
 import CreatePlanModal from "../components/CreatePlanModal";
 import Title from "../components/Title";
+import { useUser } from "../lib/UserContext";
 
 type Plan = {
   id: number;
@@ -14,6 +15,7 @@ type Plan = {
 };
 
 export default function MyPlansPage() {
+  const { user } = useUser();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,6 +50,19 @@ export default function MyPlansPage() {
     );
   }
 
+  if(!loading && user?.role !== "trainer") {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-gray-400 text-lg italic mt-20">
+          You don’t have permission to view this page. Go <Link href="/subscribed-plans" className="text-amber-400 font-semibold hover:underline">
+            {" "}Subscribed Plans{" "}
+          </Link>
+          to see your active subscriptions.
+        </p>
+      </div>
+    );
+  }
+
   // 2️⃣ Empty state after loading
   if (!loading && plans.length === 0) {
     return (
@@ -64,6 +79,8 @@ export default function MyPlansPage() {
       </div>
     );
   }
+
+  
 
   // 3️⃣ Success state
   return (

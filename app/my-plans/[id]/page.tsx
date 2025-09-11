@@ -57,7 +57,7 @@ export default function PlanPage() {
     if (id) fetchPlan();
   }, [id]);
 
-  // Fetch workouts for trainer
+  // Fetch workouts
   useEffect(() => {
     async function fetchWorkouts() {
       try {
@@ -86,12 +86,11 @@ export default function PlanPage() {
       if (plan) {
         const res = await POST(`/users/athletes/subscriptions/${plan.id}/`, {});
         if (res.ok) {
-          showToast("Successfully subscribed to the plan!", "success");
+          showToast("Successfully subscribed!", "success");
           window.location.reload();
         }
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       showToast("Subscription failed.", "error");
     }
   };
@@ -101,12 +100,11 @@ export default function PlanPage() {
       if (plan) {
         const res = await POST(`/users/athletes/unsubscriptions/${plan.id}/`, {});
         if (res.ok) {
-          showToast("Successfully unsubscribed from the plan!", "success");
+          showToast("Unsubscribed successfully!", "success");
           window.location.reload();
         }
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       showToast("Unsubscription failed.", "error");
     }
   };
@@ -116,35 +114,33 @@ export default function PlanPage() {
       if (!plan) return;
       const res = await PATCH(`/users/trainers/plans/${plan.id}/`, editData);
       if (res.status === 200) {
-        const updated = res.data;
-        setPlan(updated);
+        setPlan(res.data);
         setShowEdit(false);
-        showToast("Plan updated successfully!", "success");
+        showToast("Plan updated!", "success");
       }
-    } catch (error) {
-      console.error("Update failed:", error);
+    } catch {
       showToast("Failed to update plan.", "error");
     }
   };
 
   if (!user)
-    return <p className="p-4">You must be logged in to view this page.</p>;
+    return <p className="p-4 text-gray-400">You must be logged in to view this page.</p>;
 
   if (loading) {
     return (
       <div className="p-6 space-y-4 animate-pulse">
-        <div className="h-8 w-1/3 bg-gray-700 rounded"></div>
-        <div className="h-4 w-1/2 bg-gray-700 rounded"></div>
-        <div className="h-4 w-1/4 bg-gray-700 rounded"></div>
-        <div className="h-40 bg-gray-800 rounded"></div>
+        <div className="h-8 w-1/3 bg-gray-800 rounded"></div>
+        <div className="h-4 w-1/2 bg-gray-800 rounded"></div>
+        <div className="h-4 w-1/4 bg-gray-800 rounded"></div>
+        <div className="h-40 bg-gray-900 rounded"></div>
       </div>
     );
   }
 
-  if (!plan) return <p className="p-4">Plan not found.</p>;
+  if (!plan) return <p className="p-4 text-gray-400">Plan not found.</p>;
 
   if (user.role === "trainer" && user.id !== plan.trainer) {
-    return <p className="p-4">You are not authorized to view this plan.</p>;
+    return <p className="p-4 text-red-500">You are not authorized to view this plan.</p>;
   } else if (
     user.role === "athlete" &&
     !plan.subscriptions
@@ -152,10 +148,10 @@ export default function PlanPage() {
       .includes(user.id)
   ) {
     return (
-      <div className="p-6">
+      <div className="p-6 neon-card">
         <p className="mb-4 text-gray-300">You are not subscribed to this plan.</p>
         <button
-          className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+          className="neon-btn-green"
           onClick={handleSubscribe}
         >
           Subscribe
@@ -165,7 +161,7 @@ export default function PlanPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-white">
       <Toast
         message={toast.message}
         type={toast.type}
@@ -173,25 +169,27 @@ export default function PlanPage() {
         onClose={() => setToast({ ...toast, isVisible: false })}
       />
 
-      <div className="flex justify-between items-start">
+      {/* Header */}
+      <div className="flex justify-between items-start neon-card">
         <div>
-          <h1 className="text-2xl font-bold">{plan.name}</h1>
-          <p className="text-gray-600 mt-1">{plan.description}</p>
+          <h1 className="text-3xl font-bold">{plan.name}</h1>
+          <p className="text-gray-400 mt-1">{plan.description}</p>
         </div>
         {user.role === "trainer" && user.id === plan.trainer && (
           <div className="flex gap-2">
-            <Button onClick={() => setShowEdit(true)}>✏️ Edit</Button>
-            <Button onClick={() => setConfirmDeleteOpen(true)}>🗑️ Delete</Button>
+            <button className="neon-btn-blue" onClick={() => setShowEdit(true)}>✏️ Edit</button>
+            <button className="neon-btn-red" onClick={() => setConfirmDeleteOpen(true)}>🗑️ Delete</button>
           </div>
         )}
       </div>
 
-      <div className="mt-4">
+      {/* Plan Info */}
+      <div className="neon-card mt-6">
         <p className="font-medium">💰 Price: {plan.price} USD</p>
-        <p className={`mt-1 ${plan.is_active ? "text-green-600" : "text-red-600"}`}>
+        <p className={`mt-1 ${plan.is_active ? "text-green-400" : "text-red-400"}`}>
           {plan.is_active ? "Active" : "Inactive"}
         </p>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-400">
           Subscribed athletes –{" "}
           {plan.subscriptions.length > 0
             ? plan.subscriptions
@@ -202,10 +200,11 @@ export default function PlanPage() {
         </p>
       </div>
 
+      {/* Workouts */}
       <div className="flex justify-between items-center mt-6">
         <h2 className="text-xl font-semibold">Workouts in this Plan</h2>
         {user.role === "trainer" && (
-          <Button onClick={() => setShowModal(true)}>➕ Add Workout</Button>
+          <button className="neon-btn" onClick={() => setShowModal(true)}>➕ Add Workout</button>
         )}
       </div>
 
@@ -216,12 +215,12 @@ export default function PlanPage() {
           {plan.workouts.map((w) => (
             <div
               key={w.id}
-              className="rounded-xl border p-4 shadow-sm hover:shadow-md transition"
+              className="neon-card cursor-pointer"
             >
-              <Link href={`/workouts/${w.id}`} className="text-lg font-semibold">
+              <Link href={`/workouts/${w.id}`} className="text-lg font-semibold hover:text-cyan-300">
                 {w.name}
               </Link>
-              <p className="text-sm text-gray-600">{w.description}</p>
+              <p className="text-sm text-gray-400">{w.description}</p>
             </div>
           ))}
         </div>
@@ -230,13 +229,13 @@ export default function PlanPage() {
       {user.role === "athlete" && (
         <button
           onClick={handleUnsubscribe}
-          className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+          className="mt-6 neon-btn-red"
         >
           Unsubscribe
         </button>
       )}
 
-      {/* Add Workout Modal */}
+      {/* Modals */}
       {showModal && (
         <AddWorkoutToPlanModal
           plan={plan}
@@ -244,11 +243,9 @@ export default function PlanPage() {
           onUpdatePlan={handleUpdatePlanWorkouts}
         />
       )}
-
-      {/* Edit Plan Modal */}
       {showEdit && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white text-black rounded-xl shadow-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="neon-card bg-gray-950 text-white w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Edit Plan</h2>
 
             <input
@@ -256,20 +253,20 @@ export default function PlanPage() {
               value={editData.name}
               onChange={(e) => setEditData({ ...editData, name: e.target.value })}
               placeholder="Plan Name"
-              className="w-full mb-2 p-2 border rounded"
+              className="w-full mb-2 p-2 rounded bg-gray-900 border border-cyan-400 text-white"
             />
             <textarea
               value={editData.description}
               onChange={(e) => setEditData({ ...editData, description: e.target.value })}
               placeholder="Description"
-              className="w-full mb-2 p-2 border rounded"
+              className="w-full mb-2 p-2 rounded bg-gray-900 border border-cyan-400 text-white"
             />
             <input
               type="number"
               value={editData.price}
               onChange={(e) => setEditData({ ...editData, price: e.target.value })}
               placeholder="Price"
-              className="w-full mb-2 p-2 border rounded"
+              className="w-full mb-2 p-2 rounded bg-gray-900 border border-cyan-400 text-white"
             />
 
             <label className="flex items-center space-x-2 mb-4">
@@ -277,13 +274,14 @@ export default function PlanPage() {
                 type="checkbox"
                 checked={editData.is_active}
                 onChange={(e) => setEditData({ ...editData, is_active: e.target.checked })}
+                className="accent-cyan-400"
               />
               <span>Active</span>
             </label>
 
-            {/* Stylish workouts selector */}
+            {/* Workout selector */}
             <label className="block mb-2 font-medium">Workouts</label>
-            <div className="border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
+            <div className="border border-cyan-400 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
               {allWorkouts.length === 0 ? (
                 <p className="text-gray-500 text-sm">No workouts available</p>
               ) : (
@@ -292,11 +290,11 @@ export default function PlanPage() {
                     key={w.id}
                     className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer transition ${
                       editData.workouts.includes(w.id)
-                        ? "bg-blue-50 border-blue-400"
-                        : "bg-gray-50 hover:bg-gray-100"
+                        ? "bg-cyan-900 border-cyan-400"
+                        : "bg-gray-900 hover:bg-gray-800 border-gray-700"
                     }`}
                   >
-                    <span className="font-medium">{w.name}</span>
+                    <span>{w.name}</span>
                     <input
                       type="checkbox"
                       checked={editData.workouts.includes(w.id)}
@@ -310,7 +308,7 @@ export default function PlanPage() {
                           });
                         }
                       }}
-                      className="w-4 h-4 accent-blue-600"
+                      className="w-4 h-4 accent-cyan-400"
                     />
                   </label>
                 ))
@@ -318,18 +316,17 @@ export default function PlanPage() {
             </div>
 
             <div className="flex justify-end gap-2 mt-6">
-              <Button onClick={() => setShowEdit(false)}>Cancel</Button>
-              <Button onClick={handleEditSave}>Save</Button>
+              <button className="neon-btn-red" onClick={() => setShowEdit(false)}>Cancel</button>
+              <button className="neon-btn-blue" onClick={handleEditSave}>Save</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Confirm Delete Modal */}
       <ConfirmModal
         isOpen={confirmDeleteOpen}
         title="Delete Plan"
-        message="Are you sure you want to delete this plan? This action cannot be undone."
+        message="Are you sure you want to delete this plan?"
         onCancel={() => setConfirmDeleteOpen(false)}
         onConfirm={async () => {
           setConfirmDeleteOpen(false);
@@ -337,17 +334,18 @@ export default function PlanPage() {
           try {
             const res = await DELETE(`/users/trainers/plans/${plan.id}/`);
             if (res.ok) {
-              showToast("Plan deleted successfully!", "success");
+              showToast("Plan deleted!", "success");
               setTimeout(() => (window.location.href = "/my-plans"), 1000);
             } else {
               showToast("Failed to delete plan.", "error");
             }
-          } catch (error) {
-            console.error("Delete failed:", error);
+          } catch {
             showToast("Network error. Try again.", "error");
           }
         }}
       />
+
+
     </div>
   );
 }

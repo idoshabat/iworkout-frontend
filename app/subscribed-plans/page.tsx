@@ -115,7 +115,7 @@ export default function SubscribedPlansPage() {
                                     </div>
                                     <div className="mt-4">
                                         <Link
-                                            href={`/plans/${plan.id}`}
+                                            href={`/my-plans/${plan.id}`}
                                             className="inline-block text-sm font-medium bg-gray-700 text-white py-2 px-4 rounded-xl hover:bg-gray-600 transition"
                                         >
                                             View Details

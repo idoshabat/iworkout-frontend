@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     const container = document.getElementById("particles");
     if (container) {
-      for (let i = 0; i < 25; i++) {
+      for (let i = 0; i < 50; i++) {
         const particle = document.createElement("div");
         particle.className = "particle";
         particle.style.left = Math.random() * 100 + "vw";
